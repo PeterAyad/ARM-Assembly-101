@@ -67,36 +67,36 @@ Remember Arduino where we used to write two functions in any program `init()` an
 
 The general code structure is as follows
 
-    ```text
+```asm
 
-        ; Data
+    ; Data
 
-        ; Procedure Exportation
-        EXPORT SystemInit
-        EXPORT __main
+    ; Procedure Exportation
+    EXPORT SystemInit
+    EXPORT __main
 
 
-        ; Code Segment declaration
-        AREA MYCODE, CODE, READONLY
-            
-
-    SystemInit FUNCTION
-
-        ; initialization code
-        
-        ENDFUNC
+    ; Code Segment declaration
+    AREA MYCODE, CODE, READONLY
         
 
+SystemInit FUNCTION
 
-    __main FUNCTION
-        
+    ; initialization code
+    
+    ENDFUNC
+    
 
-        ; main Code
 
-        ENDFUNC
-        
-        END
-    ```
+__main FUNCTION
+    
+
+    ; main Code
+
+    ENDFUNC
+    
+    END
+```
 
 ### Initialization
 
@@ -120,7 +120,7 @@ Each pin is represented by a bit in a port. Ports have `control registers` and `
 
 Each register has same offset regardless of the segment in which it exists
 
-`Control Registers` :
+`Control Registers`
 
 - `GPIOx_MODER` : 0x00
 - `GPIOx_OTYPER` : 0x04
