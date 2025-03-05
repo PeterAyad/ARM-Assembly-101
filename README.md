@@ -17,6 +17,8 @@
         - [Output Register](#output-register)
       - [Clock](#clock)
       - [Example](#example)
+    - [Bit Operations](#bit-operations)
+  - [Using TFT](#using-tft)
   - [Simulation](#simulation)
   - [Flashing](#flashing)
 
@@ -247,6 +249,36 @@ LDR    R1,  =RCC_AHB1ENR    ; Load address of clock register
 LDR    R0,  [R1]            ; Load value from clock register
 ORR.W  R0,  #0x08           ; ORR.W = logical OR for words
 STR    R0,  [R1]            ; Store updated value back to register
+```
+
+### Bit Operations
+
+In arm assembly bit operations are easy using BFI, BFC instructions
+
+<img alt="bitOperations" src="img/bitOperations.png" width="700">
+
+## Using TFT
+
+TFT connections on EasyMX board:
+
+```text
++--------- TFT ---------+
+|      D0   ←  PE0      |
+|      D1   ←  PE1      |
+|      D2   ←  PE2      |
+|      D3   ←  PE3      |
+|      D4   ←  PE4      |
+|      D5   ←  PE5      |
+|      D6   ←  PE6      |
+|      D7   ←  PE7      |
+|-----------------------|
+|      RST  ←  PE8      |
+|      BCK  ←  PE9      |
+|      RD   ←  PE10     |
+|      WR   ←  PE11     |
+|      RS   ←  PE12     |
++-----------------------+
+   TFT Mapping EasyMX
 ```
 
 ## Simulation
