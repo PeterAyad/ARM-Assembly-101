@@ -1,6 +1,6 @@
-# ARM Assemlby
+# ARM Assembly
 
-- [ARM Assemlby](#arm-assemlby)
+- [ARM Assembly](#arm-assembly)
   - [EasyMX Driver Installation](#easymx-driver-installation)
   - [Keil Installation](#keil-installation)
   - [Project Creation](#project-creation)
