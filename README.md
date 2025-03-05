@@ -57,9 +57,9 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
 3. `END MAIN` in x86 Assembly is `END` in ARM.
 4. To use functions from another file in ARM Assembly, use `EXPORT <function_name>`.
 
-### STM Operation
+### STM Operation  
 
-Similar to Arduino's `init()` and `loop()`, ARM's startup code (provided by STMicroelectronics) calls two functions: `SystemInit` and `__main`, which serve the same purpose.
+ARM's startup code (provided by STMicroelectronics) calls the `__main` function, which should contain all the necessary code.
 
 ### General Code Structure
 
@@ -67,15 +67,11 @@ Similar to Arduino's `init()` and `loop()`, ARM's startup code (provided by STMi
     ; Data
 
     ; Procedure Exportation
-    EXPORT SystemInit
     EXPORT __main
 
     ; Code Segment declaration
     AREA MYCODE, CODE, READONLY
 
-SystemInit FUNCTION
-    ; Initialization code
-    ENDFUNC
 
 __main FUNCTION
     ; Main Code
