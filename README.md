@@ -214,6 +214,11 @@ Determines the maximum switching speed of the port pins.
 
 Configures the internal pull-up or pull-down resistors for each pin.
 
+- `00` - No pull up / pull down
+- `01` - Pull up
+- `10` - Pull down
+- `11` - reserved
+
 ##### Output Register
 
 A simple register with `1` for ON and `0` for OFF.
