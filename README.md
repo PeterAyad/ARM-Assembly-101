@@ -52,17 +52,64 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
 
 ### ARM Assembly in General
 
-1. X86 `Procedures` are called `Functions` in ARM.
+1. `.data .code .stack` in x86 Assembly are written as `AREA <Area Name>, [CODE/DATA], [READONLY/READWRITE]` in ARM.
 
-2. `.data .code .stack` in x86 Assembly are `AREA <Area Name>, [CODE/DATA] , [READONLY / READWRITE]` in ARM
+    - ARM assembly can have different areas for code containing different functions, but it always starts from `main`.
+    - Some assemblers accept writing data in code without defining a specific data area.
+    - `READONLY` areas are written to flash memory, which is not writable at runtime.
+    - `READWRITE` areas are written to RAM.
 
-    - ARM assembly can have different areas for code containing different functions but it starts from main
-    - Some assemblers accept writing data in code without defining specific area
-    - `READONLY` areas are written to flash memory which is not writable in runtime
-    - `READWRITE` areas are written RAM
+2. The `Link Register (LR)` does **not** act as the `Instruction Pointer (IP)`. Instead:
+    - **PC (Program Counter)** is the actual instruction pointer.
+    - **LR (Link Register)** stores the return address when a function is called.
 
-3. `END MAIN` in x86 Assembly is `END` in ARM (all areas end in `END`).
-4. To use functions from another file in ARM Assembly, use `EXPORT <function_name>` and `include <filename>`.
+3. `CALL` and `RET` instructions (which exist in x86) do not exist in ARM. Instead, ARM uses:
+    - **Branch and Link (`BL`)** for calling functions/procedures.
+    - **Branch Exchange (`BX LR`)** for returning.
+
+   ```assembly
+   BL my_function   @ Calls my_function, storing return address in LR
+   BX LR            @ Returns to the caller
+   ```
+
+4. ARM has **Procedures** and **Functions**.
+
+   - Conceptually:
+     - `Functions` return a value.
+     - `Procedures` may perform actions but do not necessarily return a value.
+     - **All functions are procedures, but not all procedures are functions.**
+
+   Example of a procedure:
+
+   ```assembly
+   procedure_example:
+       PUSH {R4, LR}   @ Save R4 and LR
+       MOV R0, #5      @ Example operation
+       MOV R1, #10     @ Another operation
+       POP {R4, LR}    @ Restore R4 and LR
+       BX LR           @ Return to caller
+   ```
+
+   Example of a function:
+
+   ```assembly
+   function_with_stack:
+       PUSH {R4, LR}   @ Save R4 and LR
+       MOV R4, #20
+       ADD R0, R0, R4  @ Modify R0
+       MOV R0, #10     @ Return value
+       POP {R4, LR}    @ Restore R4 and LR
+       BX LR           @ Return to caller
+   ```
+
+5. To use functions from another file in ARM Assembly, use:
+
+   ```assembly
+   EXPORT <function_name>  @ Export function for external use
+   INCLUDE <filename>      @ Include another assembly file
+   ```
+
+6. `END MAIN` in x86 Assembly is simply written as `END` in ARM.
 
 ### STM Operation  
 
@@ -71,17 +118,18 @@ ARM's startup code (provided by STMicroelectronics) calls the `__main` function,
 ### General Code Structure
 
 ```assembly
-    ; Data
-
-    ; Procedure Exportation
     EXPORT __main
 
-    ; Code Segment declaration
-    AREA MYCODE, CODE, READONLY
+    AREA MYDATA, DATA, READWRITE  ; Read-Write data section (written to RAM)
 
+    ; Data
 
+    AREA MYCODE, CODE, READONLY ; Read-only data section (written to flash or ROM)
+        
 __main FUNCTION
-    ; Main Code
+
+    ; Code
+    
     ENDFUNC
     
     END
