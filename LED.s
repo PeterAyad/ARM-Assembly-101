@@ -1,142 +1,83 @@
-;******************** (C) COPYRIGHT 2018 IoTality ********************
-;* File Name          : LED.s
-;* Author             : Gopal
-;* Date               : 07-Feb-2018
-;* Description        : A simple code to blink LEDs on STM32F4 discovery board
-;*                      - The functions are called from startup code
-;*                      - Initialization carried out for GPIO-D pins PD12 to PD15 (connected to LEDs)
-;*                      - Blink interval delay implemented in software
-;*******************************************************************************
-
-; ******* Constants *******
-;Delay interval
-;The delay loop takes 313 nsec to execute at 16MHz
-;Time delay = DELAY_INTERVAL * 313 nsec
-;Overheads are ignored
-
 DELAY_INTERVAL	EQU	0x186004
 
-; **************************
+; Bus clock enable register
+RCC_AHB1ENR		EQU	0x40023830
 
+; GPIO-D control registers
+GPIOD_MODER		EQU	0x40020C00	; Configures GPIO pin mode as Input, Output, or Analog
+GPIOD_OTYPER	EQU	0x40020C04	; Configures GPIO pin output type (Push-Pull or Open-Drain)
+GPIOD_OSPEEDR	EQU 0x40020C08	; Configures GPIO pin speed
+GPIOD_PUPDR		EQU	0x40020C0C	; Configures GPIO pin pull-up/pull-down resistors
+GPIOD_ODR		EQU	0x40020C14	; GPIO output data register
 
-; ******* Register definitions *******
-
-;As per STM32F407 datasheet and reference manual
-
-RCC_AHB1ENR		EQU	0x40023830	;Clock control for AHB1 peripherals (includes GPIO)
-
-;GPIO-D control registers
-GPIOD_MODER		EQU	0x40020C00	;set GPIO pin mode as Input/Output/Analog
-GPIOD_OTYPER	EQU	0x40020C04	;Set GPIO pin type as push-pull or open drain
-GPIOD_OSPEEDR	EQU 0x40020C08	;Set GPIO pin switching speed
-GPIOD_PUPDR		EQU	0x40020C0C	;Set GPIO pin pull-up/pull-down
-GPIOD_ODR		EQU	0x40020C14	;GPIO pin output data
-
-; **************************
-
-; Export functions so they can be called from other file
-
-	EXPORT SystemInit
 	EXPORT __main
 
 	AREA	MYCODE, CODE, READONLY
 		
-; ******* Function SystemInit *******
-; * Called from startup code
-; * Calls - None
-; * Enables GPIO clock 
-; * Configures GPIO-D Pins 12 to 15 as:
-; ** Output
-; ** Push-pull (Default configuration)
-; ** High speed
-; ** Pull-up enabled
-; **************************
-
-SystemInit FUNCTION
-
-	; Enable GPIO clock
-	LDR		R1, =RCC_AHB1ENR	;Pseudo-load address in R1
-	LDR		R0, [R1]			;Copy contents at address in R1 to R0
-	ORR.W 	R0, #0x08			;Bitwise OR entire word in R0, result in R0
-	STR		R0, [R1]			;Store R0 contents to address in R1
-
-	; Set mode as output
-	LDR		R1, =GPIOD_MODER	;Two bits per pin so bits 24 to 31 control pins 12 to 15
-	LDR		R0, [R1]			
-	ORR.W 	R0, #0x55000000		;Mode bits set to '01' makes the pin mode as output
-	AND.W	R0, #0x55FFFFFF		;OR and AND both operations reqd for 2 bits
-	STR		R0, [R1]
-
-	; Set type as push-pull	(Default)
-	LDR		R1, =GPIOD_OTYPER	;Type bit '0' configures pin for push-pull
-	LDR		R0, [R1]
-	AND.W 	R0, #0xFFFF0FFF	
-	STR		R0, [R1]
-	
-	; Set Speed slow
-	LDR		R1, =GPIOD_OSPEEDR	;Two bits per pin so bits 24 to 31 control pins 12 to 15
-	LDR		R0, [R1]
-	AND.W 	R0, #0x00FFFFFF		;Speed bits set to '00' configures pin for slow speed
-	STR		R0, [R1]	
-	
-	; Set pull-up
-	LDR		R1, =GPIOD_PUPDR	;Two bits per pin so bits 24 to 31 control pins 12 to 15
-	LDR		R0, [R1]
-	AND.W	R0, #0x00FFFFFF		;Clear bits to disable pullup/pulldown
-	STR		R0, [R1]
-
-	BX		LR					;Return from function
-	
-	ENDFUNC
-	
-
-; ******* Function SystemInit *******
-; * Called from startup code
-; * Calls - None
-; * Infinite loop, never returns
-
-; * Turns on / off GPIO-D Pins 12 to 15
-; * Implements blinking delay 
-; ** A single loop of delay uses total 6 clock cycles
-; ** One cycle each for CBZ and SUBS instructions
-; ** 3 cycles for B instruction
-; ** B instruction takes 1+p cycles where p=pipeline refil cycles
-; **************************
-
 __main FUNCTION
-	
-turnON
-	; Set output high
-	LDR		R1, =GPIOD_ODR
+
+	; Enable GPIO-D clock
+	LDR		R1, =RCC_AHB1ENR	; Load address of RCC_AHB1ENR into R1
+	LDR		R0, [R1]			; Load current register value into R0
+	ORR.W 	R0, #0x08			; Set bit 3 (Enable clock for GPIOD)
+	STR		R0, [R1]			; Store updated value back to RCC_AHB1ENR
+
+	; Configure pins 12-15 as output mode
+	LDR		R1, =GPIOD_MODER	; Load address of MODER register
+	LDR		R0, [R1]			
+	ORR.W 	R0, #0x55000000		; Set bits [24-31] to '01' for output mode
+	AND.W	R0, #0x55FFFFFF		; Ensure only relevant bits are modified
+	STR		R0, [R1]			; Store updated value back to MODER register
+
+	; Configure pins as push-pull (default setting)
+	LDR		R1, =GPIOD_OTYPER	; Load address of OTYPER register
 	LDR		R0, [R1]
-	ORR.W 	R0, #0xF000
+	AND.W 	R0, #0xFFFF0FFF		; Clear bits [12-15] (set to push-pull mode)
 	STR		R0, [R1]
 
-	LDR		R2, =DELAY_INTERVAL
+	; Set pin speed to low
+	LDR		R1, =GPIOD_OSPEEDR	; Load address of OSPEEDR register
+	LDR		R0, [R1]
+	AND.W 	R0, #0x00FFFFFF		; Clear bits [24-31] (set speed to low)
+	STR		R0, [R1]	
+
+	; Disable pull-up/pull-down resistors
+	LDR		R1, =GPIOD_PUPDR	; Load address of PUPDR register
+	LDR		R0, [R1]
+	AND.W	R0, #0x00FFFFFF		; Clear bits [24-31] (disable pull-up/pull-down)
+	STR		R0, [R1]
+
+turnON
+	; Set GPIO pins 12-15 high
+	LDR		R1, =GPIOD_ODR		; Load address of ODR register
+	LDR		R0, [R1]
+	ORR.W 	R0, #0xF000			; Set bits [12-15] to '1' (turn on LEDs)
+	STR		R0, [R1]
+
+	LDR		R2, =DELAY_INTERVAL	; Load delay value
 	
 delay1
-	CBZ		R2, turnOFF
-	SUBS	R2, R2, #1
-	B		delay1
+	CBZ		R2, turnOFF			; If R2 == 0, branch to turnOFF
+	SUBS	R2, R2, #1			; Decrement R2
+	B		delay1				; Repeat until R2 == 0
 	
 turnOFF
-	; Set output low
-	LDR		R1, =GPIOD_ODR
+	; Set GPIO pins 12-15 low
+	LDR		R1, =GPIOD_ODR		; Load address of ODR register
 	LDR		R0, [R1]
-	AND.W	R0, #0xFFFF0FFF
+	AND.W	R0, #0xFFFF0FFF		; Clear bits [12-15] (turn off LEDs)
 	STR		R0, [R1]	
 	
-	LDR		R2,=DELAY_INTERVAL
+	LDR		R2,=DELAY_INTERVAL	; Load delay value
 	
 delay2
-	CBZ		R2, delayDone
-	SUBS	R2, R2, #1
-	B		delay2
+	CBZ		R2, delayDone		; If R2 == 0, branch to delayDone
+	SUBS	R2, R2, #1			; Decrement R2
+	B		delay2				; Repeat until R2 == 0
 
 delayDone
-	B		turnON
+	B		turnON				; Loop back to turnON
 
 	ENDFUNC
-	
 	
 	END
