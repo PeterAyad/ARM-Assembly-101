@@ -1,3 +1,4 @@
+    EXPORT __main
 
     AREA MYDATA, DATA, READWRITE  ; Read-Write data section (written to RAM)
 
@@ -13,16 +14,6 @@ GPIOD_OTYPER     EQU  0x40020C04  ; Configures GPIO pin output type (Push-Pull o
 GPIOD_OSPEEDR    EQU  0x40020C08  ; Configures GPIO pin speed
 GPIOD_PUPDR      EQU  0x40020C0C  ; Configures GPIO pin pull-up/pull-down resistors
 GPIOD_ODR        EQU  0x40020C14  ; GPIO output data register
-
-    END
-
-
-
-
-
-    EXPORT __main
-
-
 
 
     AREA MYCODE, CODE, READONLY ; Read-only data section (written to flash or ROM)

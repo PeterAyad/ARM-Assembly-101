@@ -53,9 +53,16 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
 ### ARM Assembly in General
 
 1. X86 `Procedures` are called `Functions` in ARM.
-2. `.data .code .stack` in x86 Assembly are `AREA ..., CODE, READONLY / READWRITE` in ARM.
-3. `END MAIN` in x86 Assembly is `END` in ARM.
-4. To use functions from another file in ARM Assembly, use `EXPORT <function_name>`.
+
+2. `.data .code .stack` in x86 Assembly are `AREA <Area Name>, [CODE/DATA] , [READONLY / READWRITE]` in ARM
+
+    - ARM assembly can have different areas for code containing different functions but it starts from main
+    - Some assemblers accept writing data in code without defining specific area
+    - `READONLY` areas are written to flash memory which is not writable in runtime
+    - `READWRITE` areas are written RAM
+
+3. `END MAIN` in x86 Assembly is `END` in ARM (all areas end in `END`).
+4. To use functions from another file in ARM Assembly, use `EXPORT <function_name>` and `include <filename>`.
 
 ### STM Operation  
 
