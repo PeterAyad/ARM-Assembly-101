@@ -18,26 +18,26 @@ __main FUNCTION
     ; Enable GPIO-D clock
     LDR     R1, =RCC_AHB1ENR    
     LDR     R0, [R1]            
-    ORR     R0, R0, #0x08      ; Enable GPIOD clock
+    ORR     R0, R0, #0x08        ; Enable GPIOD clock
     STR     R0, [R1]            
 
-    ; Configure pin 15 as output mode
+    ; Configure pin 15 as output mode (bits 30-31 = 01)
     LDR     R1, =GPIOD_MODER    
     LDR     R0, [R1]                 
-    BIC     R0, R0, #0xC0000000  ; Clear bits 30-31 (pin 15 mode)
-    ORR     R0, R0, #0x40000000  ; Set pin 15 as output (01)
+    BFC     R0, #30, #2          ; Clear bits 30-31
+    BFI     R0, R0, #30, #1      ; Insert '01' at bit 30
     STR     R0, [R1]            
 
-    ; Configure pin 11 as input mode
+    ; Configure pin 11 as input mode (bits 22-23 = 00)
     LDR     R1, =GPIOD_MODER    
     LDR     R0, [R1]            
-    BIC     R0, R0, #0x00C00000  ; Clear bits 22-23 (pin 11 mode)
+    BFC     R0, #22, #2          ; Clear bits 22-23 (set to 00)
     STR     R0, [R1]            
 
-    ; Disable pull-up/pull-down resistors for pin 11
+    ; Disable pull-up/pull-down resistors for pin 11 (bits 22-23 = 00)
     LDR     R1, =GPIOD_PUPDR    
     LDR     R0, [R1]
-    BIC     R0, R0, #0x00C00000  ; Clear bits 22-23 (no pull-up/pull-down)
+    BFC     R0, #22, #2          ; Clear bits 22-23 (set to 00)
     STR     R0, [R1]
 
 readInput
@@ -51,14 +51,14 @@ readInput
 turnOn
     LDR     R1, =GPIOD_ODR      
     LDR     R0, [R1]
-    ORR     R0, R0, #0x8000     ; Turn on LED (set bit 15)
+    BFI     R0, R0, #15, #1     ; Set bit 15 (turn on LED)
     STR     R0, [R1]
     B       readInput
 
 turnOff
     LDR     R1, =GPIOD_ODR      
     LDR     R0, [R1]
-    BIC     R0, R0, #0x8000     ; Turn off LED (clear bit 15)
+    BFC     R0, #15, #1         ; Clear bit 15 (turn off LED)
     STR     R0, [R1]
     B       readInput
     
