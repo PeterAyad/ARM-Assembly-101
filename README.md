@@ -93,7 +93,7 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
    Example of a function:
 
    ```assembly
-   function_with_stack:
+   function_example:
        PUSH {R4, LR}   @ Save R4 and LR
        MOV R4, #20
        ADD R0, R0, R4  @ Modify R0
