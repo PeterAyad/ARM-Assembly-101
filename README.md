@@ -68,8 +68,8 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
     - **Branch Exchange (`BX LR`)** for returning.
 
    ```assembly
-   BL my_function   @ Calls my_function, storing return address in LR
-   BX LR            @ Returns to the caller
+   BL my_function   ; Calls my_function, storing return address in LR
+   BX LR            ; Returns to the caller
    ```
 
 4. ARM has **Procedures** and **Functions**.
@@ -83,30 +83,30 @@ Keil can simulate and flash code on STM chips (if a programmer is available). It
 
    ```assembly
    procedure_example:
-       PUSH {R4, LR}   @ Save R4 and LR
-       MOV R0, #5      @ Example operation
-       MOV R1, #10     @ Another operation
-       POP {R4, LR}    @ Restore R4 and LR
-       BX LR           @ Return to caller
+       PUSH {R4, LR}   ; Save R4 and LR
+       MOV R0, #5      ; Example operation
+       MOV R1, #10     ; Another operation
+       POP {R4, LR}    ; Restore R4 and LR
+       BX LR           ; Return to caller
    ```
 
    Example of a function:
 
    ```assembly
    function_example:
-       PUSH {R4, LR}   @ Save R4 and LR
+       PUSH {R4, LR}   ; Save R4 and LR
        MOV R4, #20
-       ADD R0, R0, R4  @ Modify R0
-       MOV R0, #10     @ Return value
-       POP {R4, LR}    @ Restore R4 and LR
-       BX LR           @ Return to caller
+       ADD R0, R0, R4  ; Modify R0
+       MOV R0, #10     ; Return value
+       POP {R4, LR}    ; Restore R4 and LR
+       BX LR           ; Return to caller
    ```
 
 5. To use functions from another file in ARM Assembly, use:
 
    ```assembly
-   EXPORT <function_name>  @ Export function for external use
-   INCLUDE <filename>      @ Include another assembly file
+   EXPORT <function_name>  ; Export function for external use
+   INCLUDE <filename>      ; Include another assembly file
    ```
 
 6. `END MAIN` in x86 Assembly is simply written as `END` in ARM.
