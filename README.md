@@ -33,7 +33,7 @@
 Keil can simulate and flash code on STM chips (if a programmer is available). It also supports startup code for STM32 chips (bootstrap) and different compilers for C++, C, and Assembly.
 
 1. Download Keil uVision (also called MDK-ARM) from the [Official Website](https://www.keil.com/demo/eval/arm.htm).
-2. Use the `Install Packs` utility in Keil to install the STM32F407VG package from a local ZIP file (to ensure version compatibility and startup code availability).
+2. Download and Install the STM32F407VG package v2.17.1 from [here](https://www.keil.com/pack/Keil.STM32F4xx_DFP.2.17.1.pack)
 
 ## Project Creation
 
