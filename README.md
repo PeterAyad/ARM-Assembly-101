@@ -138,7 +138,7 @@ Most microcontroller boards have external pins to connect them to other devices.
 
 All these configurations are stored in registers. Every group of pins is called a **Port**, and each port has a set of registers for configuring its pins.  
 
-For example, the `STM32F407VG` has **five ports**. Each port has **control registers** and **data registers**.  
+For example, the `STM32F407VG` has **nine ports**. Each port has **control registers** and **data registers**.  
 
 **Control Registers (32-bit):**  
 
