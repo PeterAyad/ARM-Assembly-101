@@ -277,6 +277,7 @@ TFT connections on EasyMX board:
 |      RD   ←  PE10     |
 |      WR   ←  PE11     |
 |      RS   ←  PE12     |
+|      CS   ←  PE15     |
 +-----------------------+
    TFT Mapping EasyMX
 ```
