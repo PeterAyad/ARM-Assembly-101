@@ -1,5 +1,7 @@
 # ARM Assembly
 
+<img alt="arm" src="img/arm.png" width="700">
+
 - [ARM Assembly](#arm-assembly)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
