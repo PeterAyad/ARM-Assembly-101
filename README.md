@@ -17,14 +17,14 @@
       - [Pull-up / Pull-down Register](#pull-up--pull-down-register)
       - [Data Registers: Output Register and Input Register](#data-registers-output-register-and-input-register)
     - [TFT LCDs](#tft-lcds)
-    - [**Interfacing Between STM32 and TFT Display**](#interfacing-between-stm32-and-tft-display)
-    - [**8080 Parallel Interface**](#8080-parallel-interface)
-      - [**Pin Configuration**](#pin-configuration)
-      - [**Write Cycle**](#write-cycle)
-      - [**Read Cycle**](#read-cycle)
-    - [**Display Initialization**](#display-initialization)
-    - [**Drawing**](#drawing)
-      - [**Steps to Draw on the TFT Screen**](#steps-to-draw-on-the-tft-screen)
+    - [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display)
+    - [8080 Parallel Interface](#8080-parallel-interface)
+      - [Pin Configuration](#pin-configuration)
+      - [Write Cycle](#write-cycle)
+      - [Read Cycle](#read-cycle)
+    - [Display Initialization](#display-initialization)
+    - [Drawing](#drawing)
+      - [Steps to Draw on the TFT Screen](#steps-to-draw-on-the-tft-screen)
   - [Code Structure](#code-structure)
     - [ARM Assembly in General](#arm-assembly-in-general)
     - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
@@ -227,7 +227,7 @@ ILI9341 connections on EasyMX board:
      TFT with EasyMX
 ```
 
-### **Interfacing Between STM32 and TFT Display**  
+### Interfacing Between STM32 and TFT Display  
 
 The way devices communicate with each other through pins (or wires) is called **interfacing**. Different displays support different **interface modes**.  
 
@@ -235,9 +235,9 @@ Most displays support `SPI` (**Serial Peripheral Interface**), which is widely u
 
 Instead, we will use the **8080 Parallel Interface**, which is also supported by the `ILI9341` display. Although the `ILI9341` also supports `SPI`, we will not use it in this guide.  
 
-### **8080 Parallel Interface**  
+### 8080 Parallel Interface
 
-#### **Pin Configuration**  
+#### Pin Configuration
 
 The 8080 protocol uses:  
 
@@ -250,7 +250,7 @@ The 8080 protocol uses:
 
 > **Note:** `IM2/IM1/IM0` pins are used to set the interface mode in chips that support multiple interfaces.  
 
-#### **Write Cycle**  
+#### Write Cycle
 
 - Data is read on the **rising edge** of the write signal (`WR`).  
 - Commands are sent when `D/C` is **low**, and data is sent when `D/C` is **high**.  
@@ -268,13 +268,13 @@ The 8080 protocol uses:
 
 <img alt="parallelWriteCycle" src="img/parallelWriteCycle.png" width="700">  
 
-#### **Read Cycle**  
+#### Read Cycle
 
 The read cycle is similar to the write cycle.  
 
 <img alt="readCycle" src="img/readCycle.png" width="700">  
 
-### **Display Initialization**  
+### Display Initialization
 
 To initialize the display:  
 
@@ -289,11 +289,11 @@ To initialize the display:
 9. Hold (delay).  
 10. Send the **display on command** `0x29`.  
 
-### **Drawing**  
+### Drawing
 
 In **16-bit pixel mode**, each pixel is represented by **16 bits (R:5-bit, G:6-bit, B:5-bit)**, allowing **65,536 colors**. Each pixel's data is sent in **two 8-bit transfers**.  
 
-#### **Steps to Draw on the TFT Screen**  
+#### Steps to Draw on the TFT Screen
 
 1. **Set the drawing window** from `(x1, y1)` to `(x2, y2)`:  
    - Write the **set X range command** `0x2A` (column address).  
