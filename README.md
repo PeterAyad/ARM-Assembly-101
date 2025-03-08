@@ -581,6 +581,8 @@ ADD R1, R1, #GPIO_ODR
 
 ## Bit Operations and Bitmasking in ARM Assembly
 
+<img alt="bitMasking" src="img/bitMasking.png" width="700">
+
 ### Understanding Bit Operations
 
 Bit operations allow us to manipulate individual bits in registers, which is essential in embedded programming when dealing with hardware registers, flags, and memory-mapped I/O.
