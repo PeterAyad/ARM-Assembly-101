@@ -42,9 +42,9 @@
   - [Examples](#examples)
     - [Simulation](#simulation)
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
-  - [Hardware](#hardware)
-    - [Button-Triggered LED](#button-triggered-led)
-    - [LED Blink](#led-blink)
+    - [Hardware](#hardware)
+      - [Button-Triggered LED](#button-triggered-led)
+      - [LED Blink](#led-blink)
   - [Preparing Hardware Environment](#preparing-hardware-environment)
     - [EasyMX Driver Installation](#easymx-driver-installation)
     - [Flashing](#flashing)
@@ -617,13 +617,13 @@ BFC R0, #4, #3     ; R0 = 0b11100011 (cleared bits 4-6)
 
 #### Filling the TFT Display with Color
 
-<img alt="fillScreenExample" src="examples for Proteus/Fill Screen/clofillScreenExampleck3.png" width="700">
+<img alt="fillScreenExample" src="examples for Proteus/Fill Screen/fillScreenExample.png" width="700">
 
 You can see the code [Here](./examples%20for%20Proteus/Fill%20Screen/main.s). This code is explained in the [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display) part.
 
-## Hardware
+### Hardware
 
-### Button-Triggered LED
+#### Button-Triggered LED
 
 You can see the code [Here](./examples/Button11WithLED15.s)
 
@@ -636,7 +636,7 @@ You can see the code [Here](./examples/Button11WithLED15.s)
    2. Turn On LED using output port
    3. Turn Off LED using output port
 
-### LED Blink
+#### LED Blink
 
 You can see the code [Here](./examples/LED.s)
 
