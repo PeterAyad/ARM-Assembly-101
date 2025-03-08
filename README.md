@@ -73,6 +73,8 @@ I assume you have prior experience with **x86 Assembly programming**.
 
 ### Proteus Installation  
 
+<img alt="proteus" src="img/proteus.png" width="700">
+
 For simulation, we use `Proteus V8.16`. No extra libraries are needed, as it already includes `STM32` parts, buttons, LEDs, and TFT LCDs.  
 
 Install `Proteus` as usual, ensure it is working properly, and verify that it contains the required components.  
@@ -93,6 +95,8 @@ Install `Proteus` as usual, ensure it is working properly, and verify that it co
 <img alt="stmProteus" src="img/stmProteus.webp" width="700">
 
 ### Keil Installation  
+
+<img alt="keil" src="img/keil.png" width="700">
 
 Keil can simulate and flash code to STM chips (if a hardware programmer is available). It also provides startup code (bootstrap) for STM32 chips and supports different compilers for C++, C, and Assembly.  
 
@@ -121,6 +125,8 @@ Keil can simulate and flash code to STM chips (if a hardware programmer is avail
 Most microcontrollers, such as `STM32`, `ESP`, and `AVR (Arduino)`, operate with similar concepts. Here, we will review some of these concepts to help you understand how our code will work.  
 
 ### Microcontrollers  
+
+<img alt="microcontrollers" src="img/microcontrollers.png" width="700">
 
 Most microcontroller boards have external pins to connect them to other devices. To use these pins, we must:  
 
