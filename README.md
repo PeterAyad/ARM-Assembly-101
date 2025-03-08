@@ -35,19 +35,19 @@
     - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
       - [STM32F407VG GPIO Memory Map](#stm32f407vg-gpio-memory-map)
       - [STM32F103C6 GPIO Memory Map](#stm32f103c6-gpio-memory-map)
-    - [Key Differences Between STM32F407VG and STM32F103C6 GPIO](#key-differences-between-stm32f407vg-and-stm32f103c6-gpio)
-      - [Clock](#clock)
-      - [Example](#example)
+      - [Key Differences Between STM32F407VG and STM32F103C6 GPIO](#key-differences-between-stm32f407vg-and-stm32f103c6-gpio)
   - [Bit Operations and Bitmasking in ARM Assembly](#bit-operations-and-bitmasking-in-arm-assembly)
     - [Understanding Bit Operations](#understanding-bit-operations)
     - [Bitmasking](#bitmasking)
-    - [Bitwise Instructions in ARM Assembly](#bitwise-instructions-in-arm-assembly)
+      - [Bitmask](#bitmask)
       - [1. ORR (Logical OR) - Setting a Bit](#1-orr-logical-or---setting-a-bit)
       - [2. BIC (Bit Clear) - Clearing a Bit](#2-bic-bit-clear---clearing-a-bit)
-      - [3. BFI (Bit Field Insert) - Inserting a Bit Field](#3-bfi-bit-field-insert---inserting-a-bit-field)
-      - [4. BFC (Bit Field Clear) - Clearing a Bit Field](#4-bfc-bit-field-clear---clearing-a-bit-field)
+      - [3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)](#3-bfi-bit-field-insert---inserting-a-bit-field-armv7-and-later)
+      - [4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)](#4-bfc-bit-field-clear---clearing-a-bit-field-armv7-and-later)
     - [Summary of Bit Operations](#summary-of-bit-operations)
-  - [Examples](#examples)
+    - [Clock](#clock)
+      - [Example](#example)
+  - [ARM Assembly Examples](#arm-assembly-examples)
     - [Simulation](#simulation)
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
     - [Hardware](#hardware)
@@ -542,7 +542,7 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 | `GPIOD`   | `0x40011400` |
 | `GPIOE`   | `0x40011800` |
 
-### Key Differences Between STM32F407VG and STM32F103C6 GPIO  
+#### Key Differences Between STM32F407VG and STM32F103C6 GPIO  
 
 1. **Mode Configuration**  
    - **STM32F407VG** uses `GPIOx_MODER` (single register for all pins).  
@@ -560,27 +560,15 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
    - **STM32F407VG** does **not** have `GPIOx_BRR`.  
    - **STM32F103C6** uses `GPIOx_BRR` for resetting output bits.  
 
-#### Clock
-
-To use ports or pins, we must first enable the clock for the corresponding port.
-
-To enable clock on ports on `AHB1` Bus use register `RCC_AHB1ENR   EQU  0x40023830`:
+Luckily in ARM Assembly, we can easily add an offset to a base address.
 
 ```assembly
-RCC_AHB1ENR   EQU  0x40023830
-```
-
->This register is part of the RCC registers (Reset and Clock Control). The offset of this register is `0x30` as described in section 7.3.10 of the reference manual. The memory map shows the RCC boundary address range as `0x4002 3800` to `0x4002 3BFF`. Therefore, the address of the `RCC_AHB1ENR` register is `0x4002 3830`.
-
-<img alt="clock3" src="img/clock3.png" width="700">
-
-#### Example
-
-```assembly
-LDR    R1,  =RCC_AHB1ENR    ; Load address of clock register
-LDR    R0,  [R1]            ; Load value from clock register
-ORR.W  R0,  #0x08           ; ORR.W = logical OR for words
-STR    R0,  [R1]            ; Store updated value back to register
+; define base and offset
+GPIOB_BASE      EQU     0x40010C00
+GPIO_ODR        EQU     0x0C
+; read register
+LDR R1, =GPIOB_BASE
+ADD R1, R1, #GPIO_ODR
 ```
 
 ## Bit Operations and Bitmasking in ARM Assembly
@@ -602,7 +590,16 @@ For example:
 - **Toggling a bit** → Flip a bit between 0 and 1.
 - **Checking a bit** → Test if a specific bit is set or cleared.
 
-### Bitwise Instructions in ARM Assembly
+#### Bitmask
+
+A **bitmask** is a constant used to modify specific bits in a register.
+
+```assembly
+; define bitmask as 1 shifted to the required bit location
+TFT_WR          EQU     #(1 << 3)     ; equivalent to 0x08
+; use bitmask
+ORR R2, R2, #TFT_WR                 ; sets bit 3 in R2
+```
 
 ARM provides several instructions for bit manipulation:
 
@@ -646,9 +643,11 @@ MOV R0, #0xFF      ; R0 = 0b11111111
 BIC R0, R0, #0x08  ; R0 = 0b11110111 (bit 3 cleared)
 ```
 
-#### 3. BFI (Bit Field Insert) - Inserting a Bit Field
+#### 3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)
 
 The `BFI` (Bit Field Insert) instruction allows inserting a value into specific bit positions.
+
+**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores (e.g., Cortex-M0), use `BIC` and `ORR` instead.
 
 **Syntax:**
 
@@ -669,9 +668,18 @@ MOV R1, #0x05      ; R1 = 0b00000101 (value 5)
 BFI R0, R1, #4, #3 ; R0 = 0b00010100 (insert at bit 4)
 ```
 
-#### 4. BFC (Bit Field Clear) - Clearing a Bit Field
+Alternative for older cores:
+
+```assembly
+BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
+ORR R0, R0, #(0b101 << 4) ; Insert 0b101 at bit 4
+```
+
+#### 4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)
 
 The `BFC` (Bit Field Clear) instruction clears a **range of bits**.
+
+**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores, use `BIC` instead.
 
 **Syntax:**
 
@@ -689,16 +697,45 @@ MOV R0, #0xFF      ; R0 = 0b11111111
 BFC R0, #4, #3     ; R0 = 0b11100011 (cleared bits 4-6)
 ```
 
+Alternative for older cores:
+
+```assembly
+BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
+```
+
 ### Summary of Bit Operations
 
 | Instruction | Purpose | Example |
 |------------|---------|---------|
 | `ORR` | Set a bit | `ORR R0, R0, #0x08` (Set bit 3) |
 | `BIC` | Clear a bit | `BIC R0, R0, #0x08` (Clear bit 3) |
-| `BFI` | Insert a value into a bit field | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
-| `BFC` | Clear a range of bits | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
+| `BFI` | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
+| `BFC` | Clear a range of bits (ARMv7+) | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
 
-## Examples
+### Clock
+
+To use ports or pins, we must first enable the clock for the corresponding port.
+
+To enable clock on ports on `AHB1` Bus use register `RCC_AHB1ENR   EQU  0x40023830`:
+
+```assembly
+RCC_AHB1ENR   EQU  0x40023830
+```
+
+>This register is part of the RCC registers (Reset and Clock Control). The offset of this register is `0x30` as described in section 7.3.10 of the reference manual. The memory map shows the RCC boundary address range as `0x4002 3800` to `0x4002 3BFF`. Therefore, the address of the `RCC_AHB1ENR` register is `0x4002 3830`.
+
+<img alt="clock3" src="img/clock3.png" width="700">
+
+#### Example
+
+```assembly
+LDR    R1,  =RCC_AHB1ENR    ; Load address of clock register
+LDR    R0,  [R1]            ; Load value from clock register
+ORR.W  R0,  #0x08           ; ORR.W = logical OR for words
+STR    R0,  [R1]            ; Store updated value back to register
+```
+
+## ARM Assembly Examples
 
 ### Simulation
 
