@@ -482,9 +482,6 @@ RCC_AHB1ENR   EQU  0x40023830
 
 >This register is part of the RCC registers (Reset and Clock Control). The offset of this register is `0x30` as described in section 7.3.10 of the reference manual. The memory map shows the RCC boundary address range as `0x4002 3800` to `0x4002 3BFF`. Therefore, the address of the `RCC_AHB1ENR` register is `0x4002 3830`.
 
-<img alt="clock1" src="img/clock1.png" width="300">
-<img alt="clock2" src="img/clock2.png" width="300">
-
 <img alt="clock3" src="img/clock3.png" width="700">
 
 #### Example
