@@ -1,3 +1,7 @@
+; This code is written for STM32F104VG
+; Button on PD11
+; LED on PD15
+
     EXPORT __main
 
     AREA MYDATA, DATA, READWRITE  

@@ -1,3 +1,6 @@
+; This code is written for STM32F104VG
+; LEDs on PD11-PD15
+
     EXPORT __main
 
     AREA MYDATA, DATA, READWRITE  ; Read-Write data section (written to RAM)

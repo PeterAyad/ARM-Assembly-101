@@ -1,11 +1,13 @@
+; This code is written for STM32F103C6
 
-;the following are pins connected from the TFT to our TFT
-;RD = PB9		Read pin	--> to read from touch screen input 
-;WR = PB8		Write pin	--> to write data/command to display
-;RS = PB7		Command pin	--> to choose command or data to write
-;CS = PB6		Chip Select	--> to enable the TFT,(active low)
-;RST= PB15		Reset		--> to reset the TFT (active low)
-;D0-7 = PA0-7	Data BUS	--> Put your command or data on this bus
+
+; Pin Connection
+; RD    =   PB9		Read pin	    Read from touch screen input 
+; WR    =   PB8		Write pin	    Write data/command to display
+; RS    =   PB7		Command pin	    Choose command or data to write
+; CS    =   PB6		Chip Select	    Enable the TFT,(active low)
+; RST   =   PB15	Reset		    Reset the TFT (active low)
+; D0-7  =   PA0-7	Data BUS	    Put your command or data on this bus
 
  
     AREA RESET, CODE, READONLY
