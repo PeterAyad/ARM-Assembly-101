@@ -68,7 +68,7 @@ __main
 ; TFT Write Command (R0 = command)
 ; *************************************************************
 TFT_WriteCommand
-    STMFD SP!, {LR}
+    PUSH {LR}
 
     ; Set RS (DC) low for command
     LDR R1, =GPIOB_BASE + GPIO_ODR
@@ -96,14 +96,14 @@ TFT_WriteCommand
     ORR R2, R2, #TFT_CS
     STR R2, [R1]
 
-    LDMFD SP!, {LR}
+    POP {LR}
     BX LR
 
 ; *************************************************************
 ; TFT Write Data (R0 = data)
 ; *************************************************************
 TFT_WriteData
-    STMFD SP!, {LR}
+    PUSH {LR}
 
     ; Set RS (DC) high for data
     LDR R1, =GPIOB_BASE + GPIO_ODR
@@ -131,14 +131,14 @@ TFT_WriteData
     ORR R2, R2, #TFT_CS
     STR R2, [R1]
 
-    LDMFD SP!, {LR}
+    POP {LR}
     BX LR
 
 ; *************************************************************
 ; TFT Initialization
 ; *************************************************************
 TFT_Init
-    STMFD SP!, {LR}
+    PUSH {LR}
 
     ; Reset TFT (PB15 low ? high)
     LDR R1, =GPIOB_BASE + GPIO_ODR
@@ -175,14 +175,14 @@ TFT_Init
     MOV R0, #0x29
     BL TFT_WriteCommand
 
-    LDMFD SP!, {LR}
+    POP {LR}
     BX LR
 
 ; *************************************************************
 ; TFT Fill Screen (R0 = 16-bit color)
 ; *************************************************************
 TFT_FillScreen
-    STMFD SP!, {R1-R3, LR}
+    PUSH {R1-R3, LR}
 
     ; Set Column Address
     MOV R0, #0x2A
@@ -221,19 +221,20 @@ TFT_Loop
     SUBS R3, R3, #1
     BNE TFT_Loop
 
-    LDMFD SP!, {R1-R3, LR}
+    POP {R1-R3, LR}
     BX LR
 
 ; *************************************************************
 ; Delay Function
 ; *************************************************************
 delay
-    STMFD SP!, {R0, LR}
+    PUSH {R0, LR}
     MOV R0, #50000
 delay_loop
     SUBS R0, R0, #1
     BNE delay_loop
-    LDMFD SP!, {R0, LR}
+    POP {R0, LR}
     BX LR
 
-	END
+    ENDFUNC
+    END
