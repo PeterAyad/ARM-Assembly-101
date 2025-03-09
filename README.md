@@ -10,6 +10,20 @@
       - [Using Proteus](#using-proteus)
     - [Keil Installation](#keil-installation)
       - [Project Creation](#project-creation)
+  - [Code Structure](#code-structure)
+    - [ARM Assembly in General](#arm-assembly-in-general)
+    - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
+    - [STM Operation](#stm-operation)
+    - [General Code Structure](#general-code-structure)
+    - [Bit Operations and Bitmasking in ARM Assembly](#bit-operations-and-bitmasking-in-arm-assembly)
+      - [Understanding Bit Operations](#understanding-bit-operations)
+      - [Bitmasking](#bitmasking)
+        - [Bitmask](#bitmask)
+        - [1. ORR (Logical OR) - Setting a Bit](#1-orr-logical-or---setting-a-bit)
+        - [2. BIC (Bit Clear) - Clearing a Bit](#2-bic-bit-clear---clearing-a-bit)
+        - [3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)](#3-bfi-bit-field-insert---inserting-a-bit-field-armv7-and-later)
+        - [4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)](#4-bfc-bit-field-clear---clearing-a-bit-field-armv7-and-later)
+      - [Summary of Bit Operations](#summary-of-bit-operations)
   - [Hardware Refresher](#hardware-refresher)
     - [Hardware Introduction](#hardware-introduction)
     - [Microcontrollers](#microcontrollers)
@@ -18,6 +32,14 @@
       - [Output Speed Register](#output-speed-register)
       - [Pull-up / Pull-down Register](#pull-up--pull-down-register)
       - [Data Registers: Output Register and Input Register](#data-registers-output-register-and-input-register)
+    - [Initialization](#initialization)
+      - [Ports](#ports)
+    - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
+      - [STM32F407VG GPIO Memory Map](#stm32f407vg-gpio-memory-map)
+      - [STM32F103C6 GPIO Memory Map](#stm32f103c6-gpio-memory-map)
+      - [Key Differences Between STM32F407VG and STM32F103C6 GPIO](#key-differences-between-stm32f407vg-and-stm32f103c6-gpio)
+    - [Clock](#clock)
+      - [Example](#example)
     - [TFT LCDs](#tft-lcds)
     - [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display)
     - [8080 Parallel Interface](#8080-parallel-interface)
@@ -27,28 +49,6 @@
     - [Display Initialization](#display-initialization)
     - [Drawing](#drawing)
       - [Steps to Draw on the TFT Screen](#steps-to-draw-on-the-tft-screen)
-  - [Code Structure](#code-structure)
-    - [ARM Assembly in General](#arm-assembly-in-general)
-    - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
-    - [STM Operation](#stm-operation)
-    - [General Code Structure](#general-code-structure)
-    - [Initialization](#initialization)
-      - [Ports](#ports)
-    - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
-      - [STM32F407VG GPIO Memory Map](#stm32f407vg-gpio-memory-map)
-      - [STM32F103C6 GPIO Memory Map](#stm32f103c6-gpio-memory-map)
-      - [Key Differences Between STM32F407VG and STM32F103C6 GPIO](#key-differences-between-stm32f407vg-and-stm32f103c6-gpio)
-  - [Bit Operations and Bitmasking in ARM Assembly](#bit-operations-and-bitmasking-in-arm-assembly)
-    - [Understanding Bit Operations](#understanding-bit-operations)
-    - [Bitmasking](#bitmasking)
-      - [Bitmask](#bitmask)
-      - [1. ORR (Logical OR) - Setting a Bit](#1-orr-logical-or---setting-a-bit)
-      - [2. BIC (Bit Clear) - Clearing a Bit](#2-bic-bit-clear---clearing-a-bit)
-      - [3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)](#3-bfi-bit-field-insert---inserting-a-bit-field-armv7-and-later)
-      - [4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)](#4-bfc-bit-field-clear---clearing-a-bit-field-armv7-and-later)
-    - [Summary of Bit Operations](#summary-of-bit-operations)
-    - [Clock](#clock)
-      - [Example](#example)
   - [ARM Assembly Examples](#arm-assembly-examples)
     - [Simulation](#simulation)
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
@@ -117,205 +117,6 @@ Keil can simulate and flash code to STM chips (if a hardware programmer is avail
 7. Start coding, compiling, and building.  
 
 **Note:** Code can be simulated at the register level by debugging in Keil.  
-
-## Hardware Refresher
-
-### Hardware Introduction  
-
-Most microcontrollers, such as `STM32`, `ESP`, and `AVR (Arduino)`, operate with similar concepts. Here, we will review some of these concepts to help you understand how our code will work.  
-
-### Microcontrollers  
-
-<img alt="microcontrollers" src="img/microcontrollers.png" width="700">
-
-Most microcontroller boards have external pins to connect them to other devices. To use these pins, we must:  
-
-1. Configure which pins are used as outputs and which as inputs.  
-2. Configure whether input pins have pull-up or pull-down resistors.  
-3. Implement a method to write to output pins.  
-4. Implement a method to read input pins.  
-5. Apply all other necessary configurations.  
-
-All these configurations are stored in registers. Every group of pins is called a **Port**, and each port has a set of registers for configuring its pins.  
-
-For example, the `STM32F407VG` has **nine ports**. Each port has **control registers** and **data registers**.  
-
-**Control Registers (32-bit):**  
-
-- `GPIOx_MODER` – Selects the I/O direction.  
-- `GPIOx_OTYPER` – Selects the output type (push-pull or open-drain).  
-- `GPIOx_OSPEEDR` – Selects the pin speed.  
-- `GPIOx_PUPDR` – Selects the pull-up/pull-down configuration.  
-
-**Data Registers (16-bit):**  
-
-- `GPIOx_IDR` – Stores input data (read-only).  
-- `GPIOx_ODR` – Stores output data (read/write).  
-
-#### Mode Register  
-
-<img alt="Mode Register" src="img/modeRegister.png" width="700">  
-
-Each port pin is associated with **two bits** in the mode register:  
-
-- `00` – Input mode  
-- `01` – Output mode  
-- `10` – Analog mode  
-- `11` – Alternate function mode  
-
-#### Output Type Register  
-
-<img alt="Output Type Register" src="img/outputType.png" width="700">  
-
-This register configures output pins as either **push-pull** or **open-drain**:  
-
-- `0` – Push-pull  
-- `1` – Open-drain  
-
-#### Output Speed Register  
-
-<img alt="Output Speed Register" src="img/outputSpeedRegister.png" width="700">  
-
-This register determines the maximum switching speed of the port pins:  
-
-- `00` – Low speed (2 MHz to 8 MHz)  
-- `01` – Medium speed (12.5 MHz to 50 MHz)  
-- `10` – High speed (25 MHz to 100 MHz)  
-- `11` – Very high speed (50 MHz to 180 MHz)  
-
-#### Pull-up / Pull-down Register  
-
-<img alt="Pull-up / Pull-down Register" src="img/pullUpPullDownRegister.png" width="700">  
-
-This register configures the internal pull-up or pull-down resistors for each pin:  
-
-- `00` – No pull-up / pull-down  
-- `01` – Pull-up  
-- `10` – Pull-down  
-- `11` – Reserved  
-
-#### Data Registers: Output Register and Input Register  
-
-These registers store the state of the GPIO pins, where:  
-
-- `1` – ON (High)  
-- `0` – OFF (Low)  
-
-### TFT LCDs  
-
-TFT LCDs are graphical displays capable of rendering colored frames pixel by pixel. In our examples, we will use the `ILI9341` TFT display because:  
-
-- It supports multiple interface modes.  
-- It is available in Proteus' default library.  
-- It is widely available in the market.  
-- It is included in the `EasyMX` kit.  
-
-<img alt="ili9341" src="img/ili9341.png" width="400">
-
-ILI9341 connections on EasyMX board:
-
-```text
-+--------- TFT ---------+
-|      D0   ←  PE0      |
-|      D1   ←  PE1      |
-|      D2   ←  PE2      |
-|      D3   ←  PE3      |
-|      D4   ←  PE4      |
-|      D5   ←  PE5      |
-|      D6   ←  PE6      |
-|      D7   ←  PE7      |
-|-----------------------|
-|      RST  ←  PE8      |
-|      BCK  ←  PE9      |
-|      RD   ←  PE10     |
-|      WR   ←  PE11     |
-|      RS   ←  PE12     |
-|      CS   ←  PE15     |
-+-----------------------+
-     TFT with EasyMX
-```
-
-### Interfacing Between STM32 and TFT Display  
-
-The way devices communicate with each other through pins (or wires) is called **interfacing**. Different displays support different **interface modes**.  
-
-Most displays support `SPI` (**Serial Peripheral Interface**), which is widely used in electronics. However, since we are writing **ARM Assembly**, implementing `SPI` without libraries can be complex.  
-
-Instead, we will use the **8080 Parallel Interface**, which is also supported by the `ILI9341` display. Although the `ILI9341` also supports `SPI`, we will not use it in this guide.  
-
-### 8080 Parallel Interface
-
-#### Pin Configuration
-
-The 8080 protocol uses:  
-
-- **8 data pins**: `D0 - D7`  
-- **1 read pin**: `RD`  
-- **1 write pin**: `WR`  
-- **1 chip select pin**: `CS`  
-- **1 reset pin**: `RST`  
-- **1 data/control selection pin**: `RS` (also called `D/C`)  
-
-> **Note:** `IM2/IM1/IM0` pins are used to set the interface mode in chips that support multiple interfaces.  
-
-#### Write Cycle
-
-- Data is read on the **rising edge** of the write signal (`WR`).  
-- Commands are sent when `D/C` is **low**, and data is sent when `D/C` is **high**.  
-- The write cycle works as follows:  
-
-  1. Set `CS` **low**.  
-  2. If sending a **command**, set `D/C` **low**.  
-  3. Write data on `D0-D7`.  
-  4. Set `WR` **low**.  
-  5. If needed, add a **delay**.  
-  6. Set `WR` **high**.  
-  7. If needed, add a **delay**.  
-  8. If a **command was sent**, set `D/C` **high**.  
-  9. Set `CS` **high**.  
-
-<img alt="parallelWriteCycle" src="img/parallelWriteCycle.png" width="700">  
-
-#### Read Cycle
-
-The read cycle is similar to the write cycle.  
-
-<img alt="readCycle" src="img/readCycle.png" width="700">  
-
-### Display Initialization
-
-To initialize the display:  
-
-1. Reset the display by setting the reset pin `RST` **low**.  
-2. Hold (delay).  
-3. Set the reset pin **high**.  
-4. Write the **soft reset command** `0x01` (following the write cycle).  
-5. Hold (delay).  
-6. Write the **display off command** `0x28` (following the write cycle).  
-7. Set the **pixel format** to **16-bit** by writing command `0x3A`, then writing data `0x55`.  
-8. Send the **sleep out command** `0x11`.  
-9. Hold (delay).  
-10. Send the **display on command** `0x29`.  
-
-### Drawing
-
-In **16-bit pixel mode**, each pixel is represented by **16 bits (R:5-bit, G:6-bit, B:5-bit)**, allowing **65,536 colors**. Each pixel's data is sent in **two 8-bit transfers**.  
-
-#### Steps to Draw on the TFT Screen
-
-1. **Set the drawing window** from `(x1, y1)` to `(x2, y2)`:  
-   - Write the **set X range command** `0x2A` (column address).  
-   - Send the **start X coordinate** (write data **twice**).  
-   - Send the **end X coordinate** (write data **twice**).  
-   - Write the **set Y range command** `0x2B` (row/page address).  
-   - Send the **start Y coordinate** (write data **twice**).  
-   - Send the **end Y coordinate** (write data **twice**).  
-
-2. **Send the pixel colors for the window**:  
-   - Write the **memory write command** `0x2C` (indicates pixel data transmission).  
-   - Loop through all pixels and send their color data (**write two bytes per pixel**).  
-
-> **Note:** To set the color for a **single pixel**, set the window size to cover only that pixel’s dimensions.  
 
 ## Code Structure
 
@@ -463,6 +264,232 @@ __main FUNCTION
     END
 ```
 
+### Bit Operations and Bitmasking in ARM Assembly
+
+<img alt="bitMasking" src="img/bitMasking.png" width="300">
+
+#### Understanding Bit Operations
+
+Bit operations allow us to manipulate individual bits in registers, which is essential in embedded programming when dealing with hardware registers, flags, and memory-mapped I/O.
+
+Each bit in a register can represent an **ON (1)** or **OFF (0)** state. We use bitwise operations to modify specific bits without affecting others.
+
+#### Bitmasking
+
+Bitmasking is a technique where we use a binary pattern (mask) to **set**, **clear**, or **toggle** specific bits in a value while leaving others unchanged.
+
+For example:
+
+- **Setting a bit** → Force a bit to 1.
+- **Clearing a bit** → Force a bit to 0.
+- **Toggling a bit** → Flip a bit between 0 and 1.
+- **Checking a bit** → Test if a specific bit is set or cleared.
+
+##### Bitmask
+
+A **bitmask** is a constant used to modify specific bits in a register.
+
+```assembly
+; define bitmask as 1 shifted to the required bit location
+TFT_WR          EQU     #(1 << 3)     ; equivalent to 0x08
+; use bitmask
+ORR R2, R2, #TFT_WR                 ; sets bit 3 in R2
+```
+
+ARM provides several instructions for bit manipulation:
+
+##### 1. ORR (Logical OR) - Setting a Bit
+
+The `ORR` (Logical OR) instruction is used to **set** (turn ON) specific bits while keeping others unchanged.
+
+**Syntax:**
+
+```assembly
+ORR Rd, Rn, #bit_mask
+```
+
+- `Rd` → Destination register.
+- `Rn` → Source register.
+- `bit_mask` → Bit pattern to set.
+
+Example: Set bit 3 in R0
+
+```assembly
+MOV R0, #0x00      ; R0 = 0b00000000
+ORR R0, R0, #0x08  ; R0 = 0b00001000 (bit 3 set)
+```
+
+##### 2. BIC (Bit Clear) - Clearing a Bit
+
+The `BIC` (Bit Clear) instruction is used to **clear** (turn OFF) specific bits.
+
+**Syntax:**
+
+```assembly
+BIC Rd, Rn, #bit_mask
+```
+
+- `bit_mask` → Defines which bits to clear (set to 0).
+
+Example: Clear bit 3 in R0
+
+```assembly
+MOV R0, #0xFF      ; R0 = 0b11111111
+BIC R0, R0, #0x08  ; R0 = 0b11110111 (bit 3 cleared)
+```
+
+##### 3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)
+
+The `BFI` (Bit Field Insert) instruction allows inserting a value into specific bit positions.
+
+**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores (e.g., Cortex-M0), use `BIC` and `ORR` instead.
+
+**Syntax:**
+
+```assembly
+BFI Rd, Rn, #lsb, #width
+```
+
+- `Rd` → Destination register.
+- `Rn` → Source value.
+- `lsb` → Least Significant Bit position to insert the value.
+- `width` → Number of bits to insert.
+
+Example: Insert 3-bit value (0b101) at bit position 4
+
+```assembly
+MOV R0, #0x00      ; R0 = 0b00000000
+MOV R1, #0x05      ; R1 = 0b00000101 (value 5)
+BFI R0, R1, #4, #3 ; R0 = 0b00010100 (insert at bit 4)
+```
+
+Alternative for older cores:
+
+```assembly
+BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
+ORR R0, R0, #(0b101 << 4) ; Insert 0b101 at bit 4
+```
+
+##### 4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)
+
+The `BFC` (Bit Field Clear) instruction clears a **range of bits**.
+
+**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores, use `BIC` instead.
+
+**Syntax:**
+
+```assembly
+BFC Rd, #lsb, #width
+```
+
+- `lsb` → Least Significant Bit position to clear.
+- `width` → Number of bits to clear.
+
+Example: Clear 3 bits starting from bit 4
+
+```assembly
+MOV R0, #0xFF      ; R0 = 0b11111111
+BFC R0, #4, #3     ; R0 = 0b11100011 (cleared bits 4-6)
+```
+
+Alternative for older cores:
+
+```assembly
+BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
+```
+
+#### Summary of Bit Operations
+
+| Instruction | Purpose | Example |
+|------------|---------|---------|
+| `ORR` | Set a bit | `ORR R0, R0, #0x08` (Set bit 3) |
+| `BIC` | Clear a bit | `BIC R0, R0, #0x08` (Clear bit 3) |
+| `BFI` | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
+| `BFC` | Clear a range of bits (ARMv7+) | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
+
+## Hardware Refresher
+
+### Hardware Introduction  
+
+Most microcontrollers, such as `STM32`, `ESP`, and `AVR (Arduino)`, operate with similar concepts. Here, we will review some of these concepts to help you understand how our code will work.  
+
+### Microcontrollers  
+
+<img alt="microcontrollers" src="img/microcontrollers.png" width="700">
+
+Most microcontroller boards have external pins to connect them to other devices. To use these pins, we must:  
+
+1. Configure which pins are used as outputs and which as inputs.  
+2. Configure whether input pins have pull-up or pull-down resistors.  
+3. Implement a method to write to output pins.  
+4. Implement a method to read input pins.  
+5. Apply all other necessary configurations.  
+
+All these configurations are stored in registers. Every group of pins is called a **Port**, and each port has a set of registers for configuring its pins.  
+
+For example, the `STM32F407VG` has **nine ports**. Each port has **control registers** and **data registers**.  
+
+**Control Registers (32-bit):**  
+
+- `GPIOx_MODER` – Selects the I/O direction.  
+- `GPIOx_OTYPER` – Selects the output type (push-pull or open-drain).  
+- `GPIOx_OSPEEDR` – Selects the pin speed.  
+- `GPIOx_PUPDR` – Selects the pull-up/pull-down configuration.  
+
+**Data Registers (16-bit):**  
+
+- `GPIOx_IDR` – Stores input data (read-only).  
+- `GPIOx_ODR` – Stores output data (read/write).  
+
+#### Mode Register  
+
+<img alt="Mode Register" src="img/modeRegister.png" width="700">  
+
+Each port pin is associated with **two bits** in the mode register:  
+
+- `00` – Input mode  
+- `01` – Output mode  
+- `10` – Analog mode  
+- `11` – Alternate function mode  
+
+#### Output Type Register  
+
+<img alt="Output Type Register" src="img/outputType.png" width="700">  
+
+This register configures output pins as either **push-pull** or **open-drain**:  
+
+- `0` – Push-pull  
+- `1` – Open-drain  
+
+#### Output Speed Register  
+
+<img alt="Output Speed Register" src="img/outputSpeedRegister.png" width="700">  
+
+This register determines the maximum switching speed of the port pins:  
+
+- `00` – Low speed (2 MHz to 8 MHz)  
+- `01` – Medium speed (12.5 MHz to 50 MHz)  
+- `10` – High speed (25 MHz to 100 MHz)  
+- `11` – Very high speed (50 MHz to 180 MHz)  
+
+#### Pull-up / Pull-down Register  
+
+<img alt="Pull-up / Pull-down Register" src="img/pullUpPullDownRegister.png" width="700">  
+
+This register configures the internal pull-up or pull-down resistors for each pin:  
+
+- `00` – No pull-up / pull-down  
+- `01` – Pull-up  
+- `10` – Pull-down  
+- `11` – Reserved  
+
+#### Data Registers: Output Register and Input Register  
+
+These registers store the state of the GPIO pins, where:  
+
+- `1` – ON (High)  
+- `0` – OFF (Low)  
+
 ### Initialization
 
 All registers are memory-mapped (accessed using `LDR` and `STR`).
@@ -579,149 +606,6 @@ LDR R1, =GPIOB_BASE
 ADD R1, R1, #GPIO_ODR
 ```
 
-## Bit Operations and Bitmasking in ARM Assembly
-
-<img alt="bitMasking" src="img/bitMasking.png" width="300">
-
-### Understanding Bit Operations
-
-Bit operations allow us to manipulate individual bits in registers, which is essential in embedded programming when dealing with hardware registers, flags, and memory-mapped I/O.
-
-Each bit in a register can represent an **ON (1)** or **OFF (0)** state. We use bitwise operations to modify specific bits without affecting others.
-
-### Bitmasking
-
-Bitmasking is a technique where we use a binary pattern (mask) to **set**, **clear**, or **toggle** specific bits in a value while leaving others unchanged.
-
-For example:
-
-- **Setting a bit** → Force a bit to 1.
-- **Clearing a bit** → Force a bit to 0.
-- **Toggling a bit** → Flip a bit between 0 and 1.
-- **Checking a bit** → Test if a specific bit is set or cleared.
-
-#### Bitmask
-
-A **bitmask** is a constant used to modify specific bits in a register.
-
-```assembly
-; define bitmask as 1 shifted to the required bit location
-TFT_WR          EQU     #(1 << 3)     ; equivalent to 0x08
-; use bitmask
-ORR R2, R2, #TFT_WR                 ; sets bit 3 in R2
-```
-
-ARM provides several instructions for bit manipulation:
-
-#### 1. ORR (Logical OR) - Setting a Bit
-
-The `ORR` (Logical OR) instruction is used to **set** (turn ON) specific bits while keeping others unchanged.
-
-**Syntax:**
-
-```assembly
-ORR Rd, Rn, #bit_mask
-```
-
-- `Rd` → Destination register.
-- `Rn` → Source register.
-- `bit_mask` → Bit pattern to set.
-
-Example: Set bit 3 in R0
-
-```assembly
-MOV R0, #0x00      ; R0 = 0b00000000
-ORR R0, R0, #0x08  ; R0 = 0b00001000 (bit 3 set)
-```
-
-#### 2. BIC (Bit Clear) - Clearing a Bit
-
-The `BIC` (Bit Clear) instruction is used to **clear** (turn OFF) specific bits.
-
-**Syntax:**
-
-```assembly
-BIC Rd, Rn, #bit_mask
-```
-
-- `bit_mask` → Defines which bits to clear (set to 0).
-
-Example: Clear bit 3 in R0
-
-```assembly
-MOV R0, #0xFF      ; R0 = 0b11111111
-BIC R0, R0, #0x08  ; R0 = 0b11110111 (bit 3 cleared)
-```
-
-#### 3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)
-
-The `BFI` (Bit Field Insert) instruction allows inserting a value into specific bit positions.
-
-**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores (e.g., Cortex-M0), use `BIC` and `ORR` instead.
-
-**Syntax:**
-
-```assembly
-BFI Rd, Rn, #lsb, #width
-```
-
-- `Rd` → Destination register.
-- `Rn` → Source value.
-- `lsb` → Least Significant Bit position to insert the value.
-- `width` → Number of bits to insert.
-
-Example: Insert 3-bit value (0b101) at bit position 4
-
-```assembly
-MOV R0, #0x00      ; R0 = 0b00000000
-MOV R1, #0x05      ; R1 = 0b00000101 (value 5)
-BFI R0, R1, #4, #3 ; R0 = 0b00010100 (insert at bit 4)
-```
-
-Alternative for older cores:
-
-```assembly
-BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
-ORR R0, R0, #(0b101 << 4) ; Insert 0b101 at bit 4
-```
-
-#### 4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)
-
-The `BFC` (Bit Field Clear) instruction clears a **range of bits**.
-
-**Note:** This instruction is available only in ARMv7 (Cortex-M3 and later). If targeting older cores, use `BIC` instead.
-
-**Syntax:**
-
-```assembly
-BFC Rd, #lsb, #width
-```
-
-- `lsb` → Least Significant Bit position to clear.
-- `width` → Number of bits to clear.
-
-Example: Clear 3 bits starting from bit 4
-
-```assembly
-MOV R0, #0xFF      ; R0 = 0b11111111
-BFC R0, #4, #3     ; R0 = 0b11100011 (cleared bits 4-6)
-```
-
-Alternative for older cores:
-
-```assembly
-BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
-```
-
-### Summary of Bit Operations
-
-| Instruction | Purpose | Example |
-|------------|---------|---------|
-| `ORR` | Set a bit | `ORR R0, R0, #0x08` (Set bit 3) |
-| `BIC` | Clear a bit | `BIC R0, R0, #0x08` (Clear bit 3) |
-| `BFI` | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
-| `BFC` | Clear a range of bits (ARMv7+) | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
-
 ### Clock
 
 To use ports or pins, we must first enable the clock for the corresponding port.
@@ -744,6 +628,122 @@ LDR    R0,  [R1]            ; Load value from clock register
 ORR.W  R0,  #0x08           ; ORR.W = logical OR for words
 STR    R0,  [R1]            ; Store updated value back to register
 ```
+
+### TFT LCDs  
+
+TFT LCDs are graphical displays capable of rendering colored frames pixel by pixel. In our examples, we will use the `ILI9341` TFT display because:  
+
+- It supports multiple interface modes.  
+- It is available in Proteus' default library.  
+- It is widely available in the market.  
+- It is included in the `EasyMX` kit.  
+
+<img alt="ili9341" src="img/ili9341.png" width="400">
+
+ILI9341 connections on EasyMX board:
+
+```text
++--------- TFT ---------+
+|      D0   ←  PE0      |
+|      D1   ←  PE1      |
+|      D2   ←  PE2      |
+|      D3   ←  PE3      |
+|      D4   ←  PE4      |
+|      D5   ←  PE5      |
+|      D6   ←  PE6      |
+|      D7   ←  PE7      |
+|-----------------------|
+|      RST  ←  PE8      |
+|      BCK  ←  PE9      |
+|      RD   ←  PE10     |
+|      WR   ←  PE11     |
+|      RS   ←  PE12     |
+|      CS   ←  PE15     |
++-----------------------+
+     TFT with EasyMX
+```
+
+### Interfacing Between STM32 and TFT Display  
+
+The way devices communicate with each other through pins (or wires) is called **interfacing**. Different displays support different **interface modes**.  
+
+Most displays support `SPI` (**Serial Peripheral Interface**), which is widely used in electronics. However, since we are writing **ARM Assembly**, implementing `SPI` without libraries can be complex.  
+
+Instead, we will use the **8080 Parallel Interface**, which is also supported by the `ILI9341` display. Although the `ILI9341` also supports `SPI`, we will not use it in this guide.  
+
+### 8080 Parallel Interface
+
+#### Pin Configuration
+
+The 8080 protocol uses:  
+
+- **8 data pins**: `D0 - D7`  
+- **1 read pin**: `RD`  
+- **1 write pin**: `WR`  
+- **1 chip select pin**: `CS`  
+- **1 reset pin**: `RST`  
+- **1 data/control selection pin**: `RS` (also called `D/C`)  
+
+> **Note:** `IM2/IM1/IM0` pins are used to set the interface mode in chips that support multiple interfaces.  
+
+#### Write Cycle
+
+- Data is read on the **rising edge** of the write signal (`WR`).  
+- Commands are sent when `D/C` is **low**, and data is sent when `D/C` is **high**.  
+- The write cycle works as follows:  
+
+  1. Set `CS` **low**.  
+  2. If sending a **command**, set `D/C` **low**.  
+  3. Write data on `D0-D7`.  
+  4. Set `WR` **low**.  
+  5. If needed, add a **delay**.  
+  6. Set `WR` **high**.  
+  7. If needed, add a **delay**.  
+  8. If a **command was sent**, set `D/C` **high**.  
+  9. Set `CS` **high**.  
+
+<img alt="parallelWriteCycle" src="img/parallelWriteCycle.png" width="700">  
+
+#### Read Cycle
+
+The read cycle is similar to the write cycle.  
+
+<img alt="readCycle" src="img/readCycle.png" width="700">  
+
+### Display Initialization
+
+To initialize the display:  
+
+1. Reset the display by setting the reset pin `RST` **low**.  
+2. Hold (delay).  
+3. Set the reset pin **high**.  
+4. Write the **soft reset command** `0x01` (following the write cycle).  
+5. Hold (delay).  
+6. Write the **display off command** `0x28` (following the write cycle).  
+7. Set the **pixel format** to **16-bit** by writing command `0x3A`, then writing data `0x55`.  
+8. Send the **sleep out command** `0x11`.  
+9. Hold (delay).  
+10. Send the **display on command** `0x29`.  
+
+### Drawing
+
+In **16-bit pixel mode**, each pixel is represented by **16 bits (R:5-bit, G:6-bit, B:5-bit)**, allowing **65,536 colors**. Each pixel's data is sent in **two 8-bit transfers**.  
+
+#### Steps to Draw on the TFT Screen
+
+1. **Set the drawing window** from `(x1, y1)` to `(x2, y2)`:  
+   - Write the **set X range command** `0x2A` (column address).  
+   - Send the **start X coordinate** (write data **twice**).  
+   - Send the **end X coordinate** (write data **twice**).  
+   - Write the **set Y range command** `0x2B` (row/page address).  
+   - Send the **start Y coordinate** (write data **twice**).  
+   - Send the **end Y coordinate** (write data **twice**).  
+
+2. **Send the pixel colors for the window**:  
+   - Write the **memory write command** `0x2C` (indicates pixel data transmission).  
+   - Loop through all pixels and send their color data (**write two bytes per pixel**).  
+
+> **Note:** To set the color for a **single pixel**, set the window size to cover only that pixel’s dimensions.  
 
 ## ARM Assembly Examples
 
