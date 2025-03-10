@@ -3,6 +3,7 @@
 <img alt="arm" src="img/arm.png" width="700">
 
 - [ARM Assembly](#arm-assembly)
+  - [Disclaimer](#disclaimer)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Preparing Simulation Environment](#preparing-simulation-environment)
@@ -58,6 +59,12 @@
   - [Preparing Hardware Environment](#preparing-hardware-environment)
     - [EasyMX Driver Installation](#easymx-driver-installation)
     - [Flashing](#flashing)
+
+## Disclaimer
+
+Proteus is a commercial software that requires a valid license for use. It is not free and must be purchased from the official vendors. I do not support or encourage software piracy or any unethical methods to acquire or use Proteus illegally. Please ensure you are using a legitimate copy of the software in compliance with its licensing terms.  
+
+Using Proteus is **not mandatory**; it is just an option for simulation. If you are unable to purchase Proteus, you can consider buying an **STM32 Blue Pill** development board, which is an affordable alternative for testing and running STM32 projects on real hardware.
 
 ## Introduction
 
