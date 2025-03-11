@@ -80,7 +80,7 @@ I assume you have prior experience with **x86 Assembly programming**.
 
 ### Proteus Installation  
 
-<img alt="proteus" src="img/proteus.png" width="700">
+<img alt="proteus" src="img/proteus.jpg" width="700">
 
 For simulation, we use `Proteus V8.16`. No extra libraries are needed, as it already includes `STM32` parts, buttons, LEDs, and TFT LCDs.  
 
@@ -99,7 +99,7 @@ Install `Proteus` as usual, ensure it is working properly, and verify that it co
    3. Choose code file as the HEX file generated from the compiler
 6. Run the simulation
 
-<img alt="stmProteus" src="img/stmProteus.webp" width="700">
+<img alt="stmProteus" src="img/stmProteus.jpg" width="700">
 
 ### Keil Installation  
 
