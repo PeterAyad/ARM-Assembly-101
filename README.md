@@ -602,17 +602,6 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
    - **STM32F407VG** does **not** have `GPIOx_BRR`.  
    - **STM32F103C6** uses `GPIOx_BRR` for resetting output bits.  
 
-Luckily in ARM Assembly, we can easily add an offset to a base address.
-
-```assembly
-; define base and offset
-GPIOB_BASE      EQU     0x40010C00
-GPIO_ODR        EQU     0x0C
-; read register
-LDR R1, =GPIOB_BASE
-ADD R1, R1, #GPIO_ODR
-```
-
 Note: In ARM Assembly, we can easily add base to offset to get register address using `+` sign:
 
 ```Assembly
@@ -624,6 +613,17 @@ GPIO_ODR        EQU     0x0C
 
 ; Code
 LDR R1, =GPIOA_BASE + GPIO_ODR
+```
+
+Instead of
+
+```assembly
+; define base and offset
+GPIOB_BASE      EQU     0x40010C00
+GPIO_ODR        EQU     0x0C
+; read register
+LDR R1, =GPIOB_BASE
+ADD R1, R1, #GPIO_ODR
 ```
 
 ### Clock
