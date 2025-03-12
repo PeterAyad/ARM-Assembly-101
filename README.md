@@ -521,6 +521,7 @@ According to the STM32F4XX datasheet:
 
 <img alt="registerMapping" src="img/registerMapping.png" width="700">
 All GPIO ports are connected to `AHB1` Bus but each having its segment
+
 ```assembly
 GPIOD_MODER   EQU  0x40020C00
 GPIOD_OTYPER  EQU  0x40020C04
