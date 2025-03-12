@@ -613,6 +613,19 @@ LDR R1, =GPIOB_BASE
 ADD R1, R1, #GPIO_ODR
 ```
 
+Note: In ARM Assembly, we can easily add base to offset to get register address using `+` sign:
+
+```Assembly
+; Define register base addresses
+GPIOA_BASE      EQU     0x40010800
+
+; Define register offsets
+GPIO_ODR        EQU     0x0C
+
+; Code
+LDR R1, =GPIOA_BASE + GPIO_ODR
+```
+
 ### Clock
 
 To use ports or pins, we must first enable the clock for the corresponding port.
