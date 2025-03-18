@@ -3,8 +3,8 @@
 <img alt="arm" src="img/arm.png" width="700">
 
 - [ARM Assembly](#arm-assembly)
-  - [Disclaimer](#disclaimer)
   - [Introduction](#introduction)
+  - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
   - [Preparing Simulation Environment](#preparing-simulation-environment)
     - [Proteus Installation](#proteus-installation)
@@ -60,17 +60,17 @@
     - [EasyMX Driver Installation](#easymx-driver-installation)
     - [Flashing](#flashing)
 
-## Disclaimer
-
-Proteus is a commercial software that requires a valid license for use. It is not free and must be purchased from the official vendors. I do not support or encourage software piracy or any unethical methods to acquire or use Proteus illegally. Please ensure you are using a legitimate copy of the software in compliance with its licensing terms.  
-
-Using Proteus is **not mandatory**; it is just an option for simulation. If you are unable to purchase Proteus, you can consider buying an **STM32 Blue Pill** development board, which is an affordable alternative for testing and running STM32 projects on real hardware.
-
 ## Introduction
 
 In this guide, I aim to explain how to write, compile, and test ARM Assembly code. I am writing code using **Keil MDK** (of course, you can use `STM32CubeIDE` or any other IDE). I am testing the code using simulation first (with `Proteus`), then on hardware (using `EasyMX Pro v7 for STM`).  
 
 I am writing for both the `BluePill STM32F103C6` and the `EasyMX STM32F407VG` interchangeably, as they are quite similar. I chose the `BluePill STM32F103C6` because it is the most popular `STM32` microcontroller and the `EasyMX STM32F407VG` because I have it.  
+
+## Disclaimer
+
+Proteus is a commercial software that requires a valid license for use. It is not free and must be purchased from the official vendors. I do not support or encourage software piracy or any unethical methods to acquire or use Proteus illegally. Please ensure you are using a legitimate copy of the software in compliance with its licensing terms.  
+
+Using Proteus is **not mandatory**; it is just an option for simulation. If you are unable to purchase Proteus, you can consider buying an **STM32 Blue Pill** development board, which is an affordable alternative for testing and running STM32 projects on real hardware.
 
 ## Prerequisites  
 
