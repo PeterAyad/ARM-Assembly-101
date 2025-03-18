@@ -452,8 +452,6 @@ All registers are memory-mapped (accessed using `LDR` and `STR`).
 
 #### Ports
 
-
-
 Each register has the same offset regardless of the segment it exists in:
 
 **Control Registers:**
