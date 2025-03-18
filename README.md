@@ -6,11 +6,6 @@
   - [Introduction](#introduction)
   - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
-  - [Preparing Simulation Environment](#preparing-simulation-environment)
-    - [Proteus Installation](#proteus-installation)
-      - [Using Proteus](#using-proteus)
-    - [Keil Installation](#keil-installation)
-      - [Project Creation](#project-creation)
   - [Code Structure](#code-structure)
     - [ARM Assembly in General](#arm-assembly-in-general)
     - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
@@ -50,15 +45,20 @@
     - [Display Initialization](#display-initialization)
     - [Drawing](#drawing)
       - [Steps to Draw on the TFT Screen](#steps-to-draw-on-the-tft-screen)
-  - [ARM Assembly Examples](#arm-assembly-examples)
+  - [Preparing Simulation Environment](#preparing-simulation-environment)
+    - [Proteus Installation](#proteus-installation)
+      - [Using Proteus](#using-proteus)
+    - [Keil Installation](#keil-installation)
+      - [Project Creation](#project-creation)
+  - [Preparing Hardware Environment](#preparing-hardware-environment)
+    - [EasyMX Driver Installation](#easymx-driver-installation)
+    - [Flashing](#flashing)
+  - [Examples](#examples)
     - [Simulation](#simulation)
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
     - [Hardware](#hardware)
       - [Button-Triggered LED](#button-triggered-led)
       - [LED Blink](#led-blink)
-  - [Preparing Hardware Environment](#preparing-hardware-environment)
-    - [EasyMX Driver Installation](#easymx-driver-installation)
-    - [Flashing](#flashing)
 
 ## Introduction
 
@@ -75,55 +75,6 @@ Using Proteus is **not mandatory**; it is just an option for simulation. If you 
 ## Prerequisites  
 
 I assume you have prior experience with **x86 Assembly programming**.  
-
-## Preparing Simulation Environment
-
-### Proteus Installation  
-
-<img alt="proteus" src="img/proteus.jpg" width="700">
-
-For simulation, we use `Proteus V8.16`. No extra libraries are needed, as it already includes `STM32` parts, buttons, LEDs, and TFT LCDs.  
-
-Install `Proteus` as usual, ensure it is working properly, and verify that it contains the required components.  
-
-#### Using Proteus
-
-1. Create New Project with `Default Schematic` template but with PCB Layout or Firmware
-2. Add `Power` and `Ground` from `Terminals` list on the side bar
-   1. Set `Power` value by double click and writing label as `+3.3v` for 3.3 volts
-3. Open parts library (press `p` or open `Library` > `Pick Parts`) and search for any needed parts
-4. Connect parts by extending wires using mouse dragging
-5. If your simulation contains Micro-controllers
-   1. Double click the Micro-controllers
-   2. Check that `Crystal Frequency` is set. For example: `16MHz` or `16M`
-   3. Choose code file as the HEX file generated from the compiler
-6. Run the simulation
-
-<img alt="stmProteus" src="img/stmProteus.jpg" width="700">
-
-### Keil Installation  
-
-<img alt="keil" src="img/keil.png" width="700">
-
-Keil can simulate and flash code to STM chips (if a hardware programmer is available). It also provides startup code (bootstrap) for STM32 chips and supports different compilers for C++, C, and Assembly.  
-
-1. Download **Keil uVision** (also called **MDK-ARM**) from the [official website](https://www.keil.com/demo/eval/arm.htm).  
-2. **For BluePill**: Download and install the `STM32F103C6` package from the **Packs Installer** in Keil. Only the **DFP pack** is needed.  
-3. **For EasyMX**: Download and install the `STM32F407VG` package (v2.17.1) from [this link](https://www.keil.com/pack/Keil.STM32F4xx_DFP.2.17.1.pack).  
-
-#### Project Creation  
-
-1. Open **Keil uVision**.  
-2. Create a new project (**Project** > **Create New uVision Project**).  
-3. In the **Packs** section, select `STM32F407VG` or `STM32F103C6` as the target.  
-4. In the **Runtime Environment**, select:  
-    - **CMSIS > Core**  
-    - **Device > Startup**  
-5. **For Hardware:** Click on **Options for Target** > **Debugger** > select **ST-Link Debugger**.  
-6. **For Simulation:** Click on **Options for Target** > **Output** > check **"Create HEX File"**.  
-7. Start coding, compiling, and building.  
-
-**Note:** Code can be simulated at the register level by debugging in Keil.  
 
 ## Code Structure
 
@@ -766,7 +717,75 @@ In **16-bit pixel mode**, each pixel is represented by **16 bits (R:5-bit, G:6-b
 
 > **Note:** To set the color for a **single pixel**, set the window size to cover only that pixel’s dimensions.  
 
-## ARM Assembly Examples
+## Preparing Simulation Environment
+
+### Proteus Installation  
+
+<img alt="proteus" src="img/proteus.jpg" width="700">
+
+For simulation, we use `Proteus V8.16`. No extra libraries are needed, as it already includes `STM32` parts, buttons, LEDs, and TFT LCDs.  
+
+Install `Proteus` as usual, ensure it is working properly, and verify that it contains the required components.  
+
+#### Using Proteus
+
+1. Create New Project with `Default Schematic` template but with PCB Layout or Firmware
+2. Add `Power` and `Ground` from `Terminals` list on the side bar
+   1. Set `Power` value by double click and writing label as `+3.3v` for 3.3 volts
+3. Open parts library (press `p` or open `Library` > `Pick Parts`) and search for any needed parts
+4. Connect parts by extending wires using mouse dragging
+5. If your simulation contains Micro-controllers
+   1. Double click the Micro-controllers
+   2. Check that `Crystal Frequency` is set. For example: `16MHz` or `16M`
+   3. Choose code file as the HEX file generated from the compiler
+6. Run the simulation
+
+<img alt="stmProteus" src="img/stmProteus.jpg" width="700">
+
+### Keil Installation  
+
+<img alt="keil" src="img/keil.png" width="700">
+
+Keil can simulate and flash code to STM chips (if a hardware programmer is available). It also provides startup code (bootstrap) for STM32 chips and supports different compilers for C++, C, and Assembly.  
+
+1. Download **Keil uVision** (also called **MDK-ARM**) from the [official website](https://www.keil.com/demo/eval/arm.htm).  
+2. **For BluePill**: Download and install the `STM32F103C6` package from the **Packs Installer** in Keil. Only the **DFP pack** is needed.  
+3. **For EasyMX**: Download and install the `STM32F407VG` package (v2.17.1) from [this link](https://www.keil.com/pack/Keil.STM32F4xx_DFP.2.17.1.pack).  
+
+#### Project Creation  
+
+1. Open **Keil uVision**.  
+2. Create a new project (**Project** > **Create New uVision Project**).  
+3. In the **Packs** section, select `STM32F407VG` or `STM32F103C6` as the target.  
+4. In the **Runtime Environment**, select:  
+    - **CMSIS > Core**  
+    - **Device > Startup**  
+5. **For Hardware:** Click on **Options for Target** > **Debugger** > select **ST-Link Debugger**.  
+6. **For Simulation:** Click on **Options for Target** > **Output** > check **"Create HEX File"**.  
+7. Start coding, compiling, and building.  
+
+**Note:** Code can be simulated at the register level by debugging in Keil.  
+
+## Preparing Hardware Environment
+
+### EasyMX Driver Installation
+
+1. Install the STM driver (`ST-Link`), a general driver for any STM debugger, using [Mikro Website](https://www.mikroe.com/easymx-pro-stm32#idTabFSCHT1310) or [ARM Website](https://os.mbed.com/teams/ST/wiki/ST-Link-Driver).
+2. Install `MikroProg Suite` for flashing code.
+3. Connect the board and check the connection using `MikroProg Suite`.
+
+**Note:** The board has multiple USB ports. Connect to the one closest to the debugger (MikroProg port).
+
+### Flashing
+
+To flash the code onto the target:
+
+1. Ensure the target is connected via `MikroProg Suite`.
+2. Flash the code using Keil uVision.
+
+**Note:** After flashing, if the code does not start, reset the board.
+
+## Examples
 
 ### Simulation
 
@@ -805,22 +824,3 @@ You can see the code [Here](./examples/LED.s)
     2. Delay
     3. Turn off using Output port
     4. Delay
-
-## Preparing Hardware Environment
-
-### EasyMX Driver Installation
-
-1. Install the STM driver (`ST-Link`), a general driver for any STM debugger, using [Mikro Website](https://www.mikroe.com/easymx-pro-stm32#idTabFSCHT1310) or [ARM Website](https://os.mbed.com/teams/ST/wiki/ST-Link-Driver).
-2. Install `MikroProg Suite` for flashing code.
-3. Connect the board and check the connection using `MikroProg Suite`.
-
-**Note:** The board has multiple USB ports. Connect to the one closest to the debugger (MikroProg port).
-
-### Flashing
-
-To flash the code onto the target:
-
-1. Ensure the target is connected via `MikroProg Suite`.
-2. Flash the code using Keil uVision.
-
-**Note:** After flashing, if the code does not start, reset the board.
