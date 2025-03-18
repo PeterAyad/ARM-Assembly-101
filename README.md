@@ -89,7 +89,6 @@ I assume you have prior experience with **x86 Assembly programming**.
 | **Addition**         | `ADD R0, R1, R2`  | `ADD AX, BX`     | Add two registers                             |
 | **Subtraction**      | `SUB R0, R1, R2`  | `SUB AX, BX`     | Subtract two registers                        |
 | **Multiplication**   | `MUL R0, R1, R2`  | `MUL BX`         | Multiply (ARM: 3-operand, x86: implicit `AX`) |
-| **Division**         | `SDIV R0, R1, R2` | `DIV BX`         | Divide (ARM: 3-operand, x86: implicit `AX`)   |
 | **Bitwise AND**      | `AND R0, R1, R2`  | `AND AX, BX`     | Logical AND                                   |
 | **Bitwise OR**       | `ORR R0, R1, R2`  | `OR AX, BX`      | Logical OR                                    |
 | **Bitwise XOR**      | `EOR R0, R1, R2`  | `XOR AX, BX`     | Logical XOR                                   |
