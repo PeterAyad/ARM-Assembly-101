@@ -18,6 +18,8 @@
         - [2. BIC (Bit Clear) - Clearing a Bit](#2-bic-bit-clear---clearing-a-bit)
         - [3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)](#3-bfi-bit-field-insert---inserting-a-bit-field-armv7-and-later)
         - [4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)](#4-bfc-bit-field-clear---clearing-a-bit-field-armv7-and-later)
+        - [5. TST (Test Bit) - Checking if a Bit is Set](#5-tst-test-bit---checking-if-a-bit-is-set)
+        - [6. LSR (Logical Shift Right) - Reading a Specific Bit](#6-lsr-logical-shift-right---reading-a-specific-bit)
       - [Summary of Bit Operations](#summary-of-bit-operations)
   - [Hardware Refresher](#hardware-refresher)
     - [Hardware Introduction](#hardware-introduction)
@@ -268,8 +270,8 @@ ORR Rd, Rn, #bit_mask
 Example: Set bit 3 in R0
 
 ```assembly
-MOV R0, #0x00      ; R0 = 0b00000000
-ORR R0, R0, #0x08  ; R0 = 0b00001000 (bit 3 set)
+MOV R0, #0x00       ; R0 = 0b00000000
+ORR R0, R0, #(1 << 3)  ; R0 = 0b00001000 (bit 3 set)
 ```
 
 ##### 2. BIC (Bit Clear) - Clearing a Bit
@@ -287,8 +289,8 @@ BIC Rd, Rn, #bit_mask
 Example: Clear bit 3 in R0
 
 ```assembly
-MOV R0, #0xFF      ; R0 = 0b11111111
-BIC R0, R0, #0x08  ; R0 = 0b11110111 (bit 3 cleared)
+MOV R0, #0xFF       ; R0 = 0b11111111
+BIC R0, R0, #(1 << 3)  ; R0 = 0b11110111 (bit 3 cleared)
 ```
 
 ##### 3. BFI (Bit Field Insert) - Inserting a Bit Field (ARMv7 and Later)
@@ -311,9 +313,9 @@ BFI Rd, Rn, #lsb, #width
 Example: Insert 3-bit value (0b101) at bit position 4
 
 ```assembly
-MOV R0, #0x00      ; R0 = 0b00000000
-MOV R1, #0x05      ; R1 = 0b00000101 (value 5)
-BFI R0, R1, #4, #3 ; R0 = 0b00010100 (insert at bit 4)
+MOV R0, #0x00       ; R0 = 0b00000000
+MOV R1, #0x05       ; R1 = 0b00000101 (value 5)
+BFI R0, R1, #4, #3  ; R0 = 0b00010100 (insert at bit 4)
 ```
 
 Alternative for older cores:
@@ -341,8 +343,8 @@ BFC Rd, #lsb, #width
 Example: Clear 3 bits starting from bit 4
 
 ```assembly
-MOV R0, #0xFF      ; R0 = 0b11111111
-BFC R0, #4, #3     ; R0 = 0b11100011 (cleared bits 4-6)
+MOV R0, #0xFF       ; R0 = 0b11111111
+BFC R0, #4, #3      ; R0 = 0b11100011 (cleared bits 4-6)
 ```
 
 Alternative for older cores:
@@ -351,14 +353,58 @@ Alternative for older cores:
 BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
 ```
 
+##### 5. TST (Test Bit) - Checking if a Bit is Set
+
+The `TST` (Test) instruction is used to check if a specific bit is set.
+
+**Syntax:**
+
+```assembly
+TST Rn, #bit_mask
+```
+
+- `Rn` → Register to test.
+- `bit_mask` → Bit pattern to test.
+
+Example: Check if bit 3 is set in R0
+
+```assembly
+TST R0, #(1 << 3)   ; Check if bit 3 is set
+BEQ bit_not_set     ; If zero flag is set, bit 3 is not set
+B bit_set           ; Otherwise, bit 3 is set
+```
+
+##### 6. LSR (Logical Shift Right) - Reading a Specific Bit
+
+The `LSR` (Logical Shift Right) instruction can be used to extract a specific bit by shifting it to the least significant position.
+
+**Syntax:**
+
+```assembly
+LSR Rd, Rn, #shift_amount
+```
+
+- `Rd` → Destination register.
+- `Rn` → Source register.
+- `shift_amount` → Number of bits to shift right.
+
+Example: Read bit 3 of R0 and store it in R1 (0 or 1)
+
+```assembly
+LSR R1, R0, #3  ; Shift bit 3 to position 0
+AND R1, R1, #1  ; Mask other bits, keeping only bit 3
+```
+
 #### Summary of Bit Operations
 
 | Instruction | Purpose | Example |
 |------------|---------|---------|
-| `ORR` | Set a bit | `ORR R0, R0, #0x08` (Set bit 3) |
-| `BIC` | Clear a bit | `BIC R0, R0, #0x08` (Clear bit 3) |
+| `ORR` | Set a bit | `ORR R0, R0, #(1 << 3)` (Set bit 3) |
+| `BIC` | Clear a bit | `BIC R0, R0, #(1 << 3)` (Clear bit 3) |
 | `BFI` | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
 | `BFC` | Clear a range of bits (ARMv7+) | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
+| `TST` | Test if a bit is set | `TST R0, #(1 << 3)` (Check bit 3) |
+| `LSR` | Read a specific bit | `LSR R1, R0, #3 \n AND R1, R1, #1` (Extract bit 3) |
 
 ## Hardware Refresher
 
