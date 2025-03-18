@@ -33,7 +33,6 @@
     - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
       - [STM32F407VG GPIO Memory Map](#stm32f407vg-gpio-memory-map)
       - [STM32F103C6 GPIO Memory Map](#stm32f103c6-gpio-memory-map)
-      - [Key Differences Between STM32F407VG and STM32F103C6 GPIO](#key-differences-between-stm32f407vg-and-stm32f103c6-gpio)
     - [Clock](#clock)
       - [Example](#example)
     - [TFT LCDs](#tft-lcds)
@@ -494,10 +493,6 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 | `GPIOx_PUPDR`  | `0x0C` | Pull-up/pull-down configuration |
 | `GPIOx_IDR`    | `0x10` | Input data register |
 | `GPIOx_ODR`    | `0x14` | Output data register |
-| `GPIOx_BSRR`   | `0x18` | Bit set/reset register |
-| `GPIOx_LCKR`   | `0x1C` | Configuration lock register |
-| `GPIOx_AFRL`   | `0x20` | Alternate function low register |
-| `GPIOx_AFRH`   | `0x24` | Alternate function high register |
 
 **Base Addresses for GPIO Ports (STM32F407VG)**  
 
@@ -521,9 +516,6 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 | `GPIOx_CRH`   | `0x04` | Control register high (pins 8-15) |
 | `GPIOx_IDR`   | `0x08` | Input data register |
 | `GPIOx_ODR`   | `0x0C` | Output data register |
-| `GPIOx_BSRR`  | `0x10` | Bit set/reset register |
-| `GPIOx_BRR`   | `0x14` | Bit reset register |
-| `GPIOx_LCKR`  | `0x18` | Configuration lock register |
 
 **Base Addresses for GPIO Ports (STM32F103C6)**  
 
@@ -534,24 +526,6 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 | `GPIOC`   | `0x40011000` |
 | `GPIOD`   | `0x40011400` |
 | `GPIOE`   | `0x40011800` |
-
-#### Key Differences Between STM32F407VG and STM32F103C6 GPIO  
-
-1. **Mode Configuration**  
-   - **STM32F407VG** uses `GPIOx_MODER` (single register for all pins).  
-   - **STM32F103C6** uses `GPIOx_CRL` and `GPIOx_CRH` (separate for low/high pins).  
-
-2. **Speed Configuration**  
-   - **STM32F407VG** has `GPIOx_OSPEEDR` for different speed settings.  
-   - **STM32F103C6** does **not** have `GPIOx_OSPEEDR`; speed is set within `CRL`/`CRH`.  
-
-3. **Alternate Functions**  
-   - **STM32F407VG** has `GPIOx_AFRL` and `GPIOx_AFRH`.  
-   - **STM32F103C6** does **not** have `AFR` registers; alternate functions are set differently.  
-
-4. **Reset Register**  
-   - **STM32F407VG** does **not** have `GPIOx_BRR`.  
-   - **STM32F103C6** uses `GPIOx_BRR` for resetting output bits.  
 
 Note: In ARM Assembly, we can easily add base to offset to get register address using `+` sign:
 
