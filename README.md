@@ -763,7 +763,7 @@ Install `Proteus` as usual, ensure it is working properly, and verify that it co
 
 ### Keil Installation  
 
-<img alt="keil" src="img/keil.png" width="700">
+<img alt="KeilMDK" src="img/KeilMDK.png" width="700">
 
 Keil can simulate and flash code to STM chips (if a hardware programmer is available). It also provides startup code (bootstrap) for STM32 chips and supports different compilers for C++, C, and Assembly.  
 
