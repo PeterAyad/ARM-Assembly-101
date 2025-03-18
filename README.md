@@ -7,9 +7,8 @@
   - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
   - [Code Structure](#code-structure)
-    - [ARM Assembly in General](#arm-assembly-in-general)
+    - [ARM Instructions](#arm-instructions)
     - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
-    - [STM Operation](#stm-operation)
     - [General Code Structure](#general-code-structure)
     - [Bit Operations and Bitmasking in ARM Assembly](#bit-operations-and-bitmasking-in-arm-assembly)
       - [Understanding Bit Operations](#understanding-bit-operations)
@@ -77,7 +76,7 @@ I assume you have prior experience with **x86 Assembly programming**.
 
 ## Code Structure
 
-### ARM Assembly in General
+### ARM Instructions
 
 | **Operation**        | **ARM Assembly**  | **x86 Assembly** | **Description**                               |
 | -------------------- | ----------------- | ---------------- | --------------------------------------------- |
@@ -196,11 +195,9 @@ I assume you have prior experience with **x86 Assembly programming**.
 11. **Unified Syntax**  
     - ARM supports an alternative syntax called `.syntax unified`, which is different from traditional ARM assembly.  
 
-### STM Operation  
+### General Code Structure
 
 ARM's startup code (provided by STMicroelectronics) calls the `__main` function, which should contain all your code.
-
-### General Code Structure
 
 ```assembly
     EXPORT __main
