@@ -402,8 +402,8 @@ Each port pin is associated with **two bits** in the mode register:
 
 - `00` – Input mode  
 - `01` – Output mode  
-- `10` – Analog mode  
-- `11` – Alternate function mode  
+- `10` – Alternate function mode  
+- `11` – Analog mode
 
 #### Output Type Register  
 
@@ -563,7 +563,7 @@ RCC_AHB1ENR   EQU  0x40023830
 
 >This register is part of the RCC registers (Reset and Clock Control). The offset of this register is `0x30` as described in section 7.3.10 of the reference manual. The memory map shows the RCC boundary address range as `0x4002 3800` to `0x4002 3BFF`. Therefore, the address of the `RCC_AHB1ENR` register is `0x4002 3830`.
 
-<img alt="clock" src="img/clock.png" width="700">
+<img alt="GPIO_Clock" src="img/GPIO_Clock.png" width="700">
 
 #### Example
 
