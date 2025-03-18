@@ -396,7 +396,7 @@ For example, the `STM32F407VG` has **nine ports**. Each port has **control regis
 
 #### Mode Register  
 
-<img alt="Mode Register" src="img/modeRegister.png" width="700">  
+<img alt="GPIO_MODER" src="img/GPIO_MODER.png" width="700">
 
 Each port pin is associated with **two bits** in the mode register:  
 
@@ -407,7 +407,7 @@ Each port pin is associated with **two bits** in the mode register:
 
 #### Output Type Register  
 
-<img alt="Output Type Register" src="img/outputType.png" width="700">  
+<img alt="GPIOx_OTYPER" src="img/GPIOx_OTYPER.png" width="700">
 
 This register configures output pins as either **push-pull** or **open-drain**:  
 
@@ -416,7 +416,7 @@ This register configures output pins as either **push-pull** or **open-drain**:
 
 #### Output Speed Register  
 
-<img alt="Output Speed Register" src="img/outputSpeedRegister.png" width="700">  
+<img alt="GPIOx_OSPEEDR" src="img/GPIOx_OSPEEDR.png" width="700">
 
 This register determines the maximum switching speed of the port pins:  
 
@@ -427,7 +427,7 @@ This register determines the maximum switching speed of the port pins:
 
 #### Pull-up / Pull-down Register  
 
-<img alt="Pull-up / Pull-down Register" src="img/pullUpPullDownRegister.png" width="700">  
+<img alt="GPIO_PUPDR" src="img/GPIO_PUPDR.png" width="700">
 
 This register configures the internal pull-up or pull-down resistors for each pin:  
 
@@ -437,6 +437,9 @@ This register configures the internal pull-up or pull-down resistors for each pi
 - `11` – Reserved  
 
 #### Data Registers: Output Register and Input Register  
+
+<img alt="GPIO_IDR" src="img/GPIO_IDR.png" width="700">
+<img alt="GPIO_ODR" src="img/GPIO_ODR.png" width="700">
 
 These registers store the state of the GPIO pins, where:  
 
@@ -448,6 +451,8 @@ These registers store the state of the GPIO pins, where:
 All registers are memory-mapped (accessed using `LDR` and `STR`).
 
 #### Ports
+
+
 
 Each register has the same offset regardless of the segment it exists in:
 
