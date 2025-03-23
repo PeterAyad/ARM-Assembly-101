@@ -21,39 +21,39 @@ __main FUNCTION
     ; Enable GPIO-D clock
     LDR     R1, =RCC_AHB1ENR   
     LDR     R0, [R1]           
-    ORR.W   R0, #0x08          
+    ORR.W   R0, R0, #0x08          
     STR     R0, [R1]           
 
     ; Configure pins 12-15 as output mode
     LDR     R1, =GPIOD_MODER   
     LDR     R0, [R1]          
-    ORR.W   R0, #0x55000000   
-    AND.W   R0, #0x55FFFFFF   
+    ORR.W   R0, R0, #0x55000000   
+    AND.W   R0, R0, #0x55FFFFFF   
     STR     R0, [R1]           
 
     ; Configure pins as push-pull (default setting)
     LDR     R1, =GPIOD_OTYPER  
     LDR     R0, [R1]
-    AND.W   R0, #0xFFFF0FFF    
+    AND.W   R0, R0, #0xFFFF0FFF    
     STR     R0, [R1]
 
     ; Set pin speed to low
     LDR     R1, =GPIOD_OSPEEDR 
     LDR     R0, [R1]
-    AND.W   R0, #0x00FFFFFF    
+    AND.W   R0, R0, #0x00FFFFFF    
     STR     R0, [R1]    
 
     ; Disable pull-up/pull-down resistors
     LDR     R1, =GPIOD_PUPDR   
     LDR     R0, [R1]
-    AND.W   R0, #0x00FFFFFF    
+    AND.W   R0, R0, #0x00FFFFFF    
     STR     R0, [R1]
 
     ; Turn off using Output port
 turnON
     LDR     R1, =GPIOD_ODR     
     LDR     R0, [R1]
-    ORR.W   R0, #0xF000        
+    ORR.W   R0, R0, #0xF000        
     STR     R0, [R1]
 
     LDR     R2, =DELAY_INTERVAL 
@@ -68,7 +68,7 @@ delay1
 turnOFF
     LDR     R1, =GPIOD_ODR      
     LDR     R0, [R1]
-    AND.W   R0, #0xFFFF0FFF     
+    AND.W   R0, R0, #0xFFFF0FFF     
     STR     R0, [R1]    
 
     LDR     R2, =DELAY_INTERVAL 
