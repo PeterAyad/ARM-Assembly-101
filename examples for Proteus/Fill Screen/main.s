@@ -228,11 +228,11 @@ TFT_FillScreen
     BL TFT_WriteCommand
 
     ; Fill screen with color
-    MOV R3, #76800  ; Total pixels (320x240 / 2 since 16-bit per pixel)
+    MOV R3, #76800  ; Total pixels (320x240 since 16-bit per pixel)
 TFT_Loop
-    MOV R0, R2      ; Load high byte
+    MOV R0, R2      ; Send high byte
     BL TFT_WriteData
-    MOV R0, R1      ; Load low byte
+    MOV R0, R1      ; Send low byte
     BL TFT_WriteData
 
     SUBS R3, R3, #1
