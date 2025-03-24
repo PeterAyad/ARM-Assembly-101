@@ -11,10 +11,18 @@
 
  
     AREA RESET, CODE, READONLY
-    EXPORT __main
-    ENTRY
 
-    ; Define register base addresses
+    EXPORT __main
+
+; Colors
+Red	    EQU 0xF800
+Green	EQU 0x07E0
+Blue	EQU 0x001F
+Yellow	EQU 0xFFE0
+White	EQU 0xFFFF
+Black	EQU 0x0000
+
+; Define register base addresses
 RCC_BASE        EQU     0x40021000
 GPIOA_BASE      EQU     0x40010800
 GPIOB_BASE      EQU     0x40010C00
@@ -32,7 +40,7 @@ TFT_WR          EQU     (1 << 8)     ; Write (PB8)
 TFT_DC          EQU     (1 << 7)     ; Data/Command (PB7)
 TFT_CS          EQU     (1 << 6)     ; Chip Select (PB6)
 
-__main
+__main FUNCTION
     ; Enable clocks for GPIOA and GPIOB
     LDR R0, =RCC_BASE + RCC_APB2ENR
     LDR R1, [R0]
@@ -40,35 +48,37 @@ __main
     ORR R1, R1, #(1 << 3)  ; Enable GPIOB
     STR R1, [R0]
 
-    ; Configure PA0 - PA7 as Output (Data Bus) at 50MHz push-pull
+    ; Configure PA0 - PA7 as Output at 50MHz speed
     LDR R0, =GPIOA_BASE + GPIO_CRL
+    LDR R1, [R0]
     LDR R1, =0x33333333
     STR R1, [R0]
 
-    ; Configure PB0 - PB7 as Output (Control Signals)
+    ; Configure PB6 and PB7 as Output
     LDR R0, =GPIOB_BASE + GPIO_CRL
-    LDR R1, =0x33333333
+    LDR R1, [R0]
+    LDR R1, =0x33000000
     STR R1, [R0]
 
-    ; Configure PB8 - PB15 as Output
+    ; Configure PB8, PB9, PB15 as Output
     LDR R0, =GPIOB_BASE + GPIO_CRH
-    LDR R1, =0x33333333
+    LDR R1, [R0]
+    LDR R1, =0x30000033
     STR R1, [R0]
 
     ; Initialize TFT
     BL TFT_Init
 
-    ; Fill screen with color 0x0FF0 (light green)
-    LDR R0, =0x0FF0
+    ; Fill screen with color 
+    MOV R0, #Yellow
     BL TFT_FillScreen
 
-    B .
 
 ; *************************************************************
 ; TFT Write Command (R0 = command)
 ; *************************************************************
 TFT_WriteCommand
-    PUSH {LR}
+    PUSH {R1-R12, LR}
 
     ; Set RS (DC) low for command
     LDR R1, =GPIOB_BASE + GPIO_ODR
@@ -84,7 +94,7 @@ TFT_WriteCommand
     LDR R1, =GPIOA_BASE + GPIO_ODR
     STR R0, [R1]
 
-    ; Generate WR pulse (low ? high)
+    ; Generate WR pulse (low > high)
     LDR R1, =GPIOB_BASE + GPIO_ODR
     LDR R2, [R1]
     BIC R2, R2, #TFT_WR
@@ -96,14 +106,14 @@ TFT_WriteCommand
     ORR R2, R2, #TFT_CS
     STR R2, [R1]
 
-    POP {LR}
+    POP {R1-R12, LR}
     BX LR
 
 ; *************************************************************
 ; TFT Write Data (R0 = data)
 ; *************************************************************
 TFT_WriteData
-    PUSH {LR}
+    PUSH {R1-R12, LR}
 
     ; Set RS (DC) high for data
     LDR R1, =GPIOB_BASE + GPIO_ODR
@@ -131,16 +141,16 @@ TFT_WriteData
     ORR R2, R2, #TFT_CS
     STR R2, [R1]
 
-    POP {LR}
+    POP {R1-R12, LR}
     BX LR
 
 ; *************************************************************
 ; TFT Initialization
 ; *************************************************************
 TFT_Init
-    PUSH {LR}
+    PUSH {R0-R12, LR}
 
-    ; Reset TFT (PB15 low ? high)
+    ; Reset TFT (PB15 low > high)
     LDR R1, =GPIOB_BASE + GPIO_ODR
     LDR R2, [R1]
     BIC R2, R2, #TFT_RST
@@ -175,24 +185,30 @@ TFT_Init
     MOV R0, #0x29
     BL TFT_WriteCommand
 
-    POP {LR}
+    POP {R0-R12, LR}
     BX LR
 
 ; *************************************************************
 ; TFT Fill Screen (R0 = 16-bit color)
 ; *************************************************************
 TFT_FillScreen
-    PUSH {R1-R3, LR}
+    PUSH {R1-R12, LR}
+
+    ; Extract high and low bytes
+    MOV R3, R0
+    AND R1, R0, #0xFF ; Get the low byte (lower 8 bits)
+    LSR R2, R3, #8   ; Get the high byte (upper 8 bits)
 
     ; Set Column Address
     MOV R0, #0x2A
     BL TFT_WriteCommand
     MOV R0, #0x00
     BL TFT_WriteData
+    MOV R0, #0x00
     BL TFT_WriteData
     MOV R0, #0x00
     BL TFT_WriteData
-    MOV R0, #0xEF
+    MOV R0, #0xEF  ; Max column (239)
     BL TFT_WriteData
 
     ; Set Page Address
@@ -200,10 +216,11 @@ TFT_FillScreen
     BL TFT_WriteCommand
     MOV R0, #0x00
     BL TFT_WriteData
+    MOV R0, #0x00
     BL TFT_WriteData
     MOV R0, #0x01
     BL TFT_WriteData
-    MOV R0, #0x3F
+    MOV R0, #0x3F  ; Max row (319)
     BL TFT_WriteData
 
     ; Memory Write
@@ -211,29 +228,30 @@ TFT_FillScreen
     BL TFT_WriteCommand
 
     ; Fill screen with color
-    MOV R3, #76800  ; 320x240 pixels / 2 (since 16-bit color)
+    MOV R3, #76800  ; Total pixels (320x240 / 2 since 16-bit per pixel)
 TFT_Loop
-    LSR R1, R0, #8  ; High byte
+    MOV R0, R2      ; Load high byte
     BL TFT_WriteData
-    AND R1, R0, #0xFF  ; Low byte
+    MOV R0, R1      ; Load low byte
     BL TFT_WriteData
 
     SUBS R3, R3, #1
     BNE TFT_Loop
 
-    POP {R1-R3, LR}
+    POP {R1-R12, LR}
     BX LR
+
 
 ; *************************************************************
 ; Delay Function
 ; *************************************************************
 delay
-    PUSH {R0, LR}
+    PUSH {R0-R12, LR}
     MOV R0, #50000
 delay_loop
     SUBS R0, R0, #1
     BNE delay_loop
-    POP {R0, LR}
+    PUSH {R0-R12, LR}
     BX LR
 
     ENDFUNC
