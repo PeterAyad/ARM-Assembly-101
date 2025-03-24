@@ -77,7 +77,11 @@ Using Proteus is **not mandatory**; it is just an option for simulation. If you 
 
 ## Prerequisites  
 
-I assume you have prior experience with **x86 Assembly programming**.  
+I assume you have prior experience with **x86 Assembly programming**. You may need the following datasheets:
+
+- [STM32F407](https://www.st.com/resource/en/reference_manual/dm00031020-stm32f405-415-stm32f407-417-stm32f427-437-and-stm32f429-439-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf)
+- [STM32F103](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
+- [ILI9341](https://download.mikroe.com/documents/smart-displays/easytft/ILI9341-ILITEK.pdf)
 
 ## Code Structure
 
