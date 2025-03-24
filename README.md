@@ -35,10 +35,8 @@
         - [STM32F103C6: Configuration Register Low and Configuration Register High](#stm32f103c6-configuration-register-low-and-configuration-register-high)
         - [STM32F103C6 Data Registers: Output Register and Input Register](#stm32f103c6-data-registers-output-register-and-input-register)
     - [Initialization](#initialization)
-      - [Ports](#ports)
-    - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
-      - [STM32F407VG GPIO Memory Map](#stm32f407vg-gpio-memory-map)
-      - [STM32F103C6 GPIO Memory Map](#stm32f103c6-gpio-memory-map)
+    - [GPIO Registers in STM32F407VG](#gpio-registers-in-stm32f407vg)
+    - [GPIO Registers in STM32F103C6](#gpio-registers-in-stm32f103c6)
     - [Clock](#clock)
       - [Example](#example)
     - [TFT LCDs](#tft-lcds)
@@ -614,83 +612,6 @@ These registers store the state of the GPIO pins, where:
 
 All registers are memory-mapped (accessed using `LDR` and `STR`).
 
-#### Ports
-
-Each register has the same offset regardless of the segment it exists in:
-
-**Control Registers:**
-
-- `GPIOx_MODER`: `0x00`
-- `GPIOx_OTYPER`: `0x04`
-- `GPIOx_OSPEEDR`: `0x08`
-- `GPIOx_PUPDR`: `0x0C`
-
-**Data Registers:**
-
-- `GPIOx_IDR`: `0x10`
-- `GPIOx_ODR`: `0x14`
-
-According to the STM32F4XX datasheet:
-
-<img alt="registerMapping" src="img/registerMapping.png" width="700">
-All GPIO ports are connected to `AHB1` Bus but each having its segment
-
-```assembly
-GPIOD_MODER   EQU  0x40020C00
-GPIOD_OTYPER  EQU  0x40020C04
-GPIOD_OSPEEDR EQU  0x40020C08
-GPIOD_PUPDR   EQU  0x40020C0C
-GPIOD_ODR     EQU  0x40020C14
-```
-
-### Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6  
-
-In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accessed using **memory-mapped registers**. Each port has its own **base address**, and registers are offset from this base.
-
-#### STM32F407VG GPIO Memory Map  
-
-| Register Name   | Offset | Description                                       |
-| --------------- | ------ | ------------------------------------------------- |
-| `GPIOx_MODER`   | `0x00` | Mode register (input/output/alternate/analog)     |
-| `GPIOx_OTYPER`  | `0x04` | Output type register (push-pull/open-drain)       |
-| `GPIOx_OSPEEDR` | `0x08` | Output speed register (low/medium/high/very high) |
-| `GPIOx_PUPDR`   | `0x0C` | Pull-up/pull-down configuration                   |
-| `GPIOx_IDR`     | `0x10` | Input data register                               |
-| `GPIOx_ODR`     | `0x14` | Output data register                              |
-
-**Base Addresses for GPIO Ports (STM32F407VG)**  
-
-| GPIO Port | Base Address |
-| --------- | ------------ |
-| `GPIOA`   | `0x40020000` |
-| `GPIOB`   | `0x40020400` |
-| `GPIOC`   | `0x40020800` |
-| `GPIOD`   | `0x40020C00` |
-| `GPIOE`   | `0x40021000` |
-| `GPIOF`   | `0x40021400` |
-| `GPIOG`   | `0x40021800` |
-| `GPIOH`   | `0x40021C00` |
-| `GPIOI`   | `0x40022000` |
-
-#### STM32F103C6 GPIO Memory Map  
-
-| Register Name | Offset | Description                       |
-| ------------- | ------ | --------------------------------- |
-| `GPIOx_CRL`   | `0x00` | Control register low (pins 0-7)   |
-| `GPIOx_CRH`   | `0x04` | Control register high (pins 8-15) |
-| `GPIOx_IDR`   | `0x08` | Input data register               |
-| `GPIOx_ODR`   | `0x0C` | Output data register              |
-
-**Base Addresses for GPIO Ports (STM32F103C6)**  
-
-| GPIO Port | Base Address |
-| --------- | ------------ |
-| `GPIOA`   | `0x40010800` |
-| `GPIOB`   | `0x40010C00` |
-| `GPIOC`   | `0x40011000` |
-| `GPIOD`   | `0x40011400` |
-| `GPIOE`   | `0x40011800` |
-
 Note: In ARM Assembly, we can easily add base to offset to get register address using `+` sign:
 
 ```Assembly
@@ -715,27 +636,60 @@ LDR R1, =GPIOB_BASE
 ADD R1, R1, #GPIO_ODR
 ```
 
-### Clock
+### GPIO Registers in STM32F407VG  
 
-To use ports or pins, we must first enable the clock for the corresponding port.
+```Assembly
+; Define register base addresses
+RCC_BASE        EQU     0x40023800
+GPIOA_BASE      EQU     0x40020000
+GPIOB_BASE      EQU     0x40020400
+GPIOC_BASE      EQU     0x40020800
+GPIOD_BASE      EQU     0x40020C00
+GPIOE_BASE      EQU     0x40021000
 
-To enable clock on ports on `AHB1` Bus use register `RCC_AHB1ENR   EQU  0x40023830`:
-
-```assembly
-RCC_AHB1ENR   EQU  0x40023830
+; Define register offsets
+RCC_AHB1ENR     EQU     0x30
+GPIO_MODER      EQU     0x00
+GPIO_OTYPER     EQU     0x04
+GPIO_OSPEEDR    EQU     0x08
+GPIO_PUPDR      EQU     0x0C
+GPIO_IDR        EQU     0x10
+GPIO_ODR        EQU     0x14
 ```
 
->This register is part of the RCC registers (Reset and Clock Control). The offset of this register is `0x30` as described in section 7.3.10 of the reference manual. The memory map shows the RCC boundary address range as `0x4002 3800` to `0x4002 3BFF`. Therefore, the address of the `RCC_AHB1ENR` register is `0x4002 3830`.
+### GPIO Registers in STM32F103C6  
+
+```Assembly
+; Define register base addresses
+RCC_BASE        EQU     0x40021000
+GPIOA_BASE      EQU     0x40010800
+GPIOB_BASE      EQU     0x40010C00
+
+; Define register offsets
+RCC_APB2ENR     EQU     0x18
+GPIO_CRL        EQU     0x00
+GPIO_CRH        EQU     0x04
+GPIO_IDR        EQU     0x08
+GPIO_ODR        EQU     0x0C
+```
+
+### Clock
+
+To use any register, we must first enable the clock for the needed port. For `STM32F407VG` we need to enable corresponding port clock on register `RCC_AHB1ENR`:
 
 <img alt="GPIO_Clock" src="img/GPIO_Clock.png" width="700">
+
+while for `STM32F103C6` we need to enable corresponding port clock on register `RCC_APB2ENR`:
+
+<img alt="blue_pill_GPIO_clock" src="img/blue_pill_GPIO_clock.png" width="700">
 
 #### Example
 
 ```assembly
-LDR    R1,  =RCC_AHB1ENR    ; Load address of clock register
-LDR    R0,  [R1]            ; Load value from clock register
-ORR.W  R0,  #0x08           ; ORR.W = logical OR for words
-STR    R0,  [R1]            ; Store updated value back to register
+LDR    R1,  =RCC_BASE + RCC_AHB1ENR    ; Load address of clock register
+LDR    R0,  [R1]                       ; Load value from clock register
+ORR    R0,  R0,  #(1 << 3)                 
+STR    R0,  [R1]                       ; Store updated value back to register
 ```
 
 ### TFT LCDs  
