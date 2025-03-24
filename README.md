@@ -595,7 +595,7 @@ Each pin is associated with **four bits** in these register:
   - **Input mode (`MODE = 00`)**:  
     - `00` – Analog input  
     - `01` – Floating input  
-    - `10` – Input with pull-up/pull-down resistors (`GPIOx_ODR` is used in this case)
+    - `10` – Input with pull-up/pull-down resistors (`GPIOx_ODR` is used in this case: `0` for pull-down, `1` for pull-up)
     - `11` – Reserved  
   - **Output mode (`MODE ≠ 00`)**:  
     - `00` – General-purpose push-pull  
