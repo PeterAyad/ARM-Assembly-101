@@ -58,8 +58,9 @@
     - [Flashing](#flashing)
   - [Examples](#examples)
     - [Simulation](#simulation)
-      - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
       - [Blinking LEDs](#blinking-leds)
+      - [LED on Button Press](#led-on-button-press)
+      - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
     - [Hardware](#hardware)
       - [Button-Triggered LED](#button-triggered-led)
       - [LED Blink](#led-blink)
@@ -885,17 +886,23 @@ To flash the code onto the target:
 
 ### Simulation
 
-#### Filling the TFT Display with Color
-
-<img alt="fillScreenExample" src="examples for Proteus/Fill Screen/fillScreenExample.png" width="700">
-
-You can see the code [Here](./examples%20for%20Proteus/Fill%20Screen/main.s). This code is explained in the [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display) part.
-
 #### Blinking LEDs
 
 <img alt="blinkingLEDsProteus" src="examples for Proteus/Blinking LEDs/blinkingLEDsProteus.png" width="700">
 
 You can see the code [Here](./examples%20for%20Proteus/Blinking%20LEDs/LED_bluePill.s).
+
+#### LED on Button Press
+
+<img alt="LEDWithButton" src="./examples for Proteus/Button With LED/LEDWithButton.png" width="700">
+
+You can see the code [Here](./examples%20for%20Proteus/Button%20With%20LED/Button11WithLED15.s).
+
+#### Filling the TFT Display with Color
+
+<img alt="fillScreenExample" src="examples for Proteus/Fill Screen/fillScreenExample.png" width="700">
+
+You can see the code [Here](./examples%20for%20Proteus/Fill%20Screen/main.s). This code is explained in the [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display) part.
 
 ### Hardware
 
