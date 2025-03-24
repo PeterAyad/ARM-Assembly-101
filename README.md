@@ -7,6 +7,7 @@
   - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
   - [Code Structure](#code-structure)
+    - [Important Notations](#important-notations)
     - [ARM Instructions](#arm-instructions)
     - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
     - [General Code Structure](#general-code-structure)
@@ -78,30 +79,102 @@ I assume you have prior experience with **x86 Assembly programming**.
 
 ## Code Structure
 
-### ARM Instructions
+### Important Notations
 
-| **Operation**        | **ARM Assembly**  | **x86 Assembly** | **Description**                               |
-| -------------------- | ----------------- | ---------------- | --------------------------------------------- |
-| **Move Data**        | `MOV R0, R1`      | `MOV AX, BX`     | Move data between registers                   |
-| **Load Immediate**   | `MOV R0, #10`     | `MOV AX, 10`     | Load an immediate value                       |
-| **Load from Memory** | `LDR R0, [R1]`    | `MOV AX, [BX]`   | Load a word from memory                       |
-| **Store to Memory**  | `STR R0, [R1]`    | `MOV [BX], AX`   | Store a word to memory                        |
-| **Addition**         | `ADD R0, R1, R2`  | `ADD AX, BX`     | Add two registers                             |
-| **Subtraction**      | `SUB R0, R1, R2`  | `SUB AX, BX`     | Subtract two registers                        |
-| **Multiplication**   | `MUL R0, R1, R2`  | `MUL BX`         | Multiply (ARM: 3-operand, x86: implicit `AX`) |
-| **Bitwise AND**      | `AND R0, R1, R2`  | `AND AX, BX`     | Logical AND                                   |
-| **Bitwise OR**       | `ORR R0, R1, R2`  | `OR AX, BX`      | Logical OR                                    |
-| **Bitwise XOR**      | `EOR R0, R1, R2`  | `XOR AX, BX`     | Logical XOR                                   |
-| **Shift Left**       | `LSL R0, R1, #2`  | `SHL AX, 2`      | Logical shift left                            |
-| **Shift Right**      | `LSR R0, R1, #2`  | `SHR AX, 2`      | Logical shift right                           |
-| **Branch (Jump)**    | `B label`         | `JMP label`      | Unconditional jump                            |
-| **Branch if Zero**   | `BEQ label`       | `JE label`       | Jump if equal (zero flag set)                 |
-| **Compare**          | `CMP R0, R1`      | `CMP AX, BX`     | Compare two registers                         |
-| **Function Call**    | `BL function`     | `CALL function`  | Call a function                               |
-| **Function Return**  | `BX LR`           | `RET`            | Return from function                          |
-| **Push to Stack**    | `PUSH {R0}`       | `PUSH AX`        | Push register to stack                        |
-| **Pop from Stack**   | `POP {R0}`        | `POP AX`         | Pop register from stack                       |
-| **No Operation**     | `NOP`             | `NOP`            | No operation                                  |
+1. Parentheses (`()`)
+
+   - Used for syntax readability. Neglected by the compiler.
+
+2. Immediate Values (`#`)  
+
+   - `#` is used for immediate values in instructions like `MOV`, `ADD`, etc.  
+   - Example:  
+
+     ```assembly
+     MOV R0, #2        ; Move the immediate value 2 into R0
+     MOV R0, #(1 << 4) ; Move 16 (1 shifted left by 4) into R0
+     ```
+
+3. Immediate Values with `LDR` (`=`)  
+
+   - `LDR` with `=` allows loading larger immediate values (placed in a constant pool).  
+   - Example:  
+
+     ```assembly
+     LDR R0, =0xFFF       ; Load the immediate value 0xFFF into R0
+     LDR R0, =0xFFF + 0x5 ; Load 0x1004 into R0
+     ```
+
+   - **Important Note**: `LDR` with immediate values or variables is a pseudo-instruction which is translated to `MOV` by the compiler. EX: `LDR R0, =Variable` is exactly equal to `MOV R0, #Variable`
+  
+4. Dereferencing with `[...]`  
+
+   - Used for accessing memory via registers.  
+   - Example:  
+
+     ```assembly
+     STR R0, [R1]      ; Store R0 at the address in R1
+     LDR R0, [R1, #4]  ; Load R0 from memory at R1+4
+     ```
+
+5. Auto-Update (`!` and Post-Increment/Decrement)  
+
+   - `!` updates the base register immediately.  
+   - Example:  
+
+     ```assembly
+     LDR R0, [R1, #4]!  ; Load R0 from R1+4, then update R1 to R1+4
+     STR R0, [R1], #4   ; Store R0 at R1, then increment R1 by 4
+     ```
+
+6. Comments (`;` or `@`)  
+
+   - `;` for comments (or `@` in unified syntax).  
+   - Example:  
+
+     ```assembly
+     MOV R0, #5  ; This is a comment
+     MOV R1, #10 @ Another comment in unified syntax
+     ```
+
+### [ARM Instructions](https://os.mbed.com/media/uploads/4180_1/cortexm3_instructions.htm)
+
+`<imm/var>` = immediate values or variables
+
+| **Operation**                  | **ARM Assembly**         | **x86 Assembly**    | **Description**                               |
+| ------------------------------ | ------------------------ | ------------------- | --------------------------------------------- |
+| **Move Data**                  | `MOV R0, R1`             | `MOV AX, BX`        | Move data between registers                   |
+| **Load Immediate or Variable** | `MOV R0, #<imm/var>`     | `MOV AX, <imm/var>` | Load an immediate or a variable               |
+| **Load Immediate or Variable** | `LDR R0, =<imm/var>`     | `MOV AX, <imm/var>` | Load an immediate or a variable               |
+| **Load from Memory**           | `LDR R0, [R1]`           | `MOV AX, [BX]`      | Load a word from memory                       |
+| **Store to Memory**            | `STR R0, [R1]`           | `MOV [BX], AX`      | Store a word to memory                        |
+| **Addition**                   | `ADD R0, R1, R2`         | `ADD AX, BX`        | Add two registers                             |
+| **Addition**                   | `ADD R0, R1, #<imm/var>` | `ADD AX, <imm/var>` | Add using Immediate or Variable               |
+| **Subtraction**                | `SUB R0, R1, R2`         | `SUB AX, BX`        | Subtract two registers                        |
+| **Subtraction**                | `SUB R0, R1, #<imm/var>` | `SUB AX, <imm/var>` | Subtract using Immediate or Variable          |
+| **Multiplication**             | `MUL R0, R1, R2`         | `MUL BX`            | Multiply (ARM: 3-operand, x86: implicit `AX`) |
+| **Bitwise AND**                | `AND R0, R1, R2`         | `AND AX, BX`        | Logical AND                                   |
+| **Bitwise AND**                | `AND R0, R1, #<imm/var>` | `AND AX, <imm/var>` | Logical AND                                   |
+| **Bitwise OR**                 | `ORR R0, R1, R2`         | `OR AX, BX`         | Logical OR                                    |
+| **Bitwise OR**                 | `ORR R0, R1, #<imm/var>` | `OR AX, <imm/var>`  | Logical OR                                    |
+| **Bitwise XOR**                | `EOR R0, R1, R2`         | `XOR AX, BX`        | Logical XOR                                   |
+| **Bitwise XOR**                | `EOR R0, R1, #<imm/var>` | `XOR AX, <imm/var>` | Logical XOR                                   |
+| **Bit clear**                  | `BIC R0, R1, #<imm/var>` | -                   | Clear bits in Op1 in 1s locations in Op2      |
+| **Shift Left**                 | `LSL R0, R1, R2`         | `SHL AX, BX`        | Logical shift left                            |
+| **Shift Left**                 | `LSL R0, R1, #<imm/var>` | `SHL AX, <imm/var>` | Logical shift left                            |
+| **Shift Right**                | `LSR R0, R1, R2`         | `SHR AX, BX`        | Logical shift right                           |
+| **Shift Right**                | `LSR R0, R1, #<imm/var>` | `SHR AX, <imm/var>` | Logical shift right                           |
+| **Branch (Jump)**              | `B label`                | `JMP label`         | Unconditional jump                            |
+| **Branch if Zero**             | `BEQ label`              | `JE label`          | Jump if equal (zero flag set)                 |
+| **Binary Test**                | `TST R0, R1`             | `TEST AX, BX`       | Compare two registers (with AND)              |
+| **Compare**                    | `CMP R0, R1`             | `CMP AX, BX`        | Compare two registers (with subtraction)      |
+| **Function Call**              | `BL function`            | `CALL function`     | Call a function                               |
+| **Function Return**            | `BX LR`                  | `RET`               | Return from function                          |
+| **Push to Stack**              | `PUSH {R0}`              | `PUSH AX`           | Push register to stack                        |
+| **Push All to Stack**          | `PUSH {R0-R12, LR}`      | `PUSHA`             | Push all registers to stack                   |
+| **Pop from Stack**             | `POP {R0}`               | `POP AX`            | Pop register from stack                       |
+| **Pop All from Stack**         | `POP {R0-R12, LR}`       | `POPA`              | Pop all registers from stack                  |
+| **No Operation**               | `NOP`                    | `NOP`               | No operation                                  |
 
 ### Differences Between ARM and x86 Assembly  
 
@@ -231,14 +304,13 @@ Each bit in a register can represent an **ON (1)** or **OFF (0)** state. We use 
 
 #### Bitmasking
 
-Bitmasking is a technique where we use a binary pattern (mask) to **set**, **clear**, or **toggle** specific bits in a value while leaving others unchanged.
+Bitmasking is a technique where we use a binary pattern (mask) to **set**, **clear**, or **test** specific bits in a value while leaving others unchanged.
 
 For example:
 
 - **Setting a bit** → Force a bit to 1.
 - **Clearing a bit** → Force a bit to 0.
-- **Toggling a bit** → Flip a bit between 0 and 1.
-- **Checking a bit** → Test if a specific bit is set or cleared.
+- **Testing a bit** → Test if a specific bit is set or cleared.
 
 ##### Bitmask
 
@@ -246,7 +318,7 @@ A **bitmask** is a constant used to modify specific bits in a register.
 
 ```assembly
 ; define bitmask as 1 shifted to the required bit location
-TFT_WR          EQU     #(1 << 3)     ; equivalent to 0x08
+TFT_WR          EQU     (1 << 3)     ; equivalent to 0x08
 ; use bitmask
 ORR R2, R2, #TFT_WR                 ; sets bit 3 in R2
 ```
@@ -318,13 +390,6 @@ MOV R1, #0x05       ; R1 = 0b00000101 (value 5)
 BFI R0, R1, #4, #3  ; R0 = 0b00010100 (insert at bit 4)
 ```
 
-Alternative for older cores:
-
-```assembly
-BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
-ORR R0, R0, #(0b101 << 4) ; Insert 0b101 at bit 4
-```
-
 ##### 4. BFC (Bit Field Clear) - Clearing a Bit Field (ARMv7 and Later)
 
 The `BFC` (Bit Field Clear) instruction clears a **range of bits**.
@@ -347,12 +412,6 @@ MOV R0, #0xFF       ; R0 = 0b11111111
 BFC R0, #4, #3      ; R0 = 0b11100011 (cleared bits 4-6)
 ```
 
-Alternative for older cores:
-
-```assembly
-BIC R0, R0, #(0b111 << 4) ; Clear bits 4-6
-```
-
 ##### 5. TST (Test Bit) - Checking if a Bit is Set
 
 The `TST` (Test) instruction is used to check if a specific bit is set.
@@ -369,6 +428,7 @@ TST Rn, #bit_mask
 Example: Check if bit 3 is set in R0
 
 ```assembly
+AND R0, #(1 << 3)   ; Clear all bit but bit 3
 TST R0, #(1 << 3)   ; Check if bit 3 is set
 BEQ bit_not_set     ; If zero flag is set, bit 3 is not set
 B bit_set           ; Otherwise, bit 3 is set
@@ -392,19 +452,19 @@ Example: Read bit 3 of R0 and store it in R1 (0 or 1)
 
 ```assembly
 LSR R1, R0, #3  ; Shift bit 3 to position 0
-AND R1, R1, #1  ; Mask other bits, keeping only bit 3
+AND R1, R1, #1  ; Clear other bits, keeping only bit 3
 ```
 
 #### Summary of Bit Operations
 
-| Instruction | Purpose | Example |
-|------------|---------|---------|
-| `ORR` | Set a bit | `ORR R0, R0, #(1 << 3)` (Set bit 3) |
-| `BIC` | Clear a bit | `BIC R0, R0, #(1 << 3)` (Clear bit 3) |
-| `BFI` | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4) |
-| `BFC` | Clear a range of bits (ARMv7+) | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
-| `TST` | Test if a bit is set | `TST R0, #(1 << 3)` (Check bit 3) |
-| `LSR` | Read a specific bit | `LSR R1, R0, #3 \n AND R1, R1, #1` (Extract bit 3) |
+| Instruction | Purpose                                  | Example                                             |
+| ----------- | ---------------------------------------- | --------------------------------------------------- |
+| `ORR`       | Set a bit                                | `ORR R0, R0, #(1 << 3)` (Set bit 3)                 |
+| `BIC`       | Clear a bit                              | `BIC R0, R0, #(1 << 3)` (Clear bit 3)               |
+| `BFI`       | Insert a value into a bit field (ARMv7+) | `BFI R0, R1, #4, #3` (Insert 3-bit value at bit 4)  |
+| `BFC`       | Clear a range of bits (ARMv7+)           | `BFC R0, #4, #3` (Clear 3 bits starting from bit 4) |
+| `TST`       | Test if a bit is set                     | `TST R0, #(1 << 3)` (Check bit 3)                   |
+| `LSR`       | Extract a specific bit                   | `LSR R1, R0, #3` (Extract bit 3)                    |
 
 ## Hardware Refresher
 
@@ -531,19 +591,19 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 
 #### STM32F407VG GPIO Memory Map  
 
-| Register Name  | Offset | Description |
-|---------------|--------|-------------|
-| `GPIOx_MODER`  | `0x00` | Mode register (input/output/alternate/analog) |
-| `GPIOx_OTYPER` | `0x04` | Output type register (push-pull/open-drain) |
-| `GPIOx_OSPEEDR`| `0x08` | Output speed register (low/medium/high/very high) |
-| `GPIOx_PUPDR`  | `0x0C` | Pull-up/pull-down configuration |
-| `GPIOx_IDR`    | `0x10` | Input data register |
-| `GPIOx_ODR`    | `0x14` | Output data register |
+| Register Name   | Offset | Description                                       |
+| --------------- | ------ | ------------------------------------------------- |
+| `GPIOx_MODER`   | `0x00` | Mode register (input/output/alternate/analog)     |
+| `GPIOx_OTYPER`  | `0x04` | Output type register (push-pull/open-drain)       |
+| `GPIOx_OSPEEDR` | `0x08` | Output speed register (low/medium/high/very high) |
+| `GPIOx_PUPDR`   | `0x0C` | Pull-up/pull-down configuration                   |
+| `GPIOx_IDR`     | `0x10` | Input data register                               |
+| `GPIOx_ODR`     | `0x14` | Output data register                              |
 
 **Base Addresses for GPIO Ports (STM32F407VG)**  
 
 | GPIO Port | Base Address |
-|-----------|-------------|
+| --------- | ------------ |
 | `GPIOA`   | `0x40020000` |
 | `GPIOB`   | `0x40020400` |
 | `GPIOC`   | `0x40020800` |
@@ -556,17 +616,17 @@ In STM32 microcontrollers, GPIO (General Purpose Input/Output) ports are accesse
 
 #### STM32F103C6 GPIO Memory Map  
 
-| Register Name  | Offset | Description |
-|---------------|--------|-------------|
-| `GPIOx_CRL`   | `0x00` | Control register low (pins 0-7) |
+| Register Name | Offset | Description                       |
+| ------------- | ------ | --------------------------------- |
+| `GPIOx_CRL`   | `0x00` | Control register low (pins 0-7)   |
 | `GPIOx_CRH`   | `0x04` | Control register high (pins 8-15) |
-| `GPIOx_IDR`   | `0x08` | Input data register |
-| `GPIOx_ODR`   | `0x0C` | Output data register |
+| `GPIOx_IDR`   | `0x08` | Input data register               |
+| `GPIOx_ODR`   | `0x0C` | Output data register              |
 
 **Base Addresses for GPIO Ports (STM32F103C6)**  
 
 | GPIO Port | Base Address |
-|-----------|-------------|
+| --------- | ------------ |
 | `GPIOA`   | `0x40010800` |
 | `GPIOB`   | `0x40010C00` |
 | `GPIOC`   | `0x40011000` |
