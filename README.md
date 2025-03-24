@@ -796,15 +796,15 @@ In **16-bit pixel mode**, each pixel is represented by **16 bits (R:5-bit, G:6-b
 
 1. **Set the drawing window** from `(x1, y1)` to `(x2, y2)`:  
    - Write the **set X range command** `0x2A` (column address).  
-   - Send the **start X coordinate** (write data **twice**).  
-   - Send the **end X coordinate** (write data **twice**).  
+   - Send the **start X coordinate** (write data **twice**, higher byte then lower byte).  
+   - Send the **end X coordinate** (write data **twice**, higher byte then lower byte).  
    - Write the **set Y range command** `0x2B` (row/page address).  
-   - Send the **start Y coordinate** (write data **twice**).  
-   - Send the **end Y coordinate** (write data **twice**).  
+   - Send the **start Y coordinate** (write data **twice**, higher byte then lower byte).  
+   - Send the **end Y coordinate** (write data **twice**, higher byte then lower byte).  
 
 2. **Send the pixel colors for the window**:  
    - Write the **memory write command** `0x2C` (indicates pixel data transmission).  
-   - Loop through all pixels and send their color data (**write two bytes per pixel**).  
+   - Loop through all pixels and send their color data (**write two times per pixel**, higher byte then lower byte).  
 
 > **Note:** To set the color for a **single pixel**, set the window size to cover only that pixel’s dimensions.  
 
