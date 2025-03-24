@@ -14,13 +14,13 @@
 
     EXPORT __main
 
-; Colors
-Red	    EQU 0xF800
-Green	EQU 0x07E0
-Blue	EQU 0x001F
-Yellow	EQU 0xFFE0
-White	EQU 0xFFFF
-Black	EQU 0x0000
+;Colors
+Red     EQU 0x001F  ; 00000 000000 11111
+Green   EQU 0x07E0  ; 00000 111111 00000
+Blue    EQU 0xF800  ; 11111 000000 00000
+Yellow  EQU 0x06FF	; 11111 111111 00000
+White   EQU 0xFFFF  ; 11111 111111 11111
+Black   EQU 0x0000  ; 00000 000000 00000
 
 ; Define register base addresses
 RCC_BASE        EQU     0x40021000
