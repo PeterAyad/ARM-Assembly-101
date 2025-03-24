@@ -25,11 +25,15 @@
   - [Hardware Refresher](#hardware-refresher)
     - [Hardware Introduction](#hardware-introduction)
     - [Microcontrollers](#microcontrollers)
-      - [Mode Register](#mode-register)
-      - [Output Type Register](#output-type-register)
-      - [Output Speed Register](#output-speed-register)
-      - [Pull-up / Pull-down Register](#pull-up--pull-down-register)
-      - [Data Registers: Output Register and Input Register](#data-registers-output-register-and-input-register)
+      - [STM32F407VG (EasyMX) Port Registers](#stm32f407vg-easymx-port-registers)
+        - [STM32F407VG: Mode Register](#stm32f407vg-mode-register)
+        - [STM32F407VG: Output Type Register](#stm32f407vg-output-type-register)
+        - [STM32F407VG: Output Speed Register](#stm32f407vg-output-speed-register)
+        - [STM32F407VG: Pull-up / Pull-down Register](#stm32f407vg-pull-up--pull-down-register)
+        - [STM32F407VG Data Registers: Output Register and Input Register](#stm32f407vg-data-registers-output-register-and-input-register)
+      - [STM32F103C6 (Blue Pill) Port Registers](#stm32f103c6-blue-pill-port-registers)
+        - [STM32F103C6: Configuration Register Low and Configuration Register High](#stm32f103c6-configuration-register-low-and-configuration-register-high)
+        - [STM32F103C6 Data Registers: Output Register and Input Register](#stm32f103c6-data-registers-output-register-and-input-register)
     - [Initialization](#initialization)
       - [Ports](#ports)
     - [Memory-Mapped GPIO Registers in STM32F407VG and STM32F103C6](#memory-mapped-gpio-registers-in-stm32f407vg-and-stm32f103c6)
@@ -480,27 +484,29 @@ Most microcontroller boards have external pins to connect them to other devices.
 
 1. Configure which pins are used as outputs and which as inputs.  
 2. Configure whether input pins have pull-up or pull-down resistors.  
-3. Implement a method to write to output pins.  
-4. Implement a method to read input pins.  
-5. Apply all other necessary configurations.  
+3. Write to output pins.  
+4. Read from input pins.  
+5. Apply any other needed configurations.  
 
 All these configurations are stored in registers. Every group of pins is called a **Port**, and each port has a set of registers for configuring its pins.  
 
-For example, the `STM32F407VG` has **nine ports**. Each port has **control registers** and **data registers**.  
+For example, the `STM32F407VG` has **five ports** while `STM32F103C6` has **two ports**. Each port has **control registers** and **data registers**.  
 
-**Control Registers (32-bit):**  
+#### STM32F407VG (EasyMX) Port Registers
+
+**Control Registers:**  
 
 - `GPIOx_MODER` – Selects the I/O direction.  
 - `GPIOx_OTYPER` – Selects the output type (push-pull or open-drain).  
 - `GPIOx_OSPEEDR` – Selects the pin speed.  
 - `GPIOx_PUPDR` – Selects the pull-up/pull-down configuration.  
 
-**Data Registers (16-bit):**  
+**Data Registers:**  
 
 - `GPIOx_IDR` – Stores input data (read-only).  
 - `GPIOx_ODR` – Stores output data (read/write).  
 
-#### Mode Register  
+##### STM32F407VG: Mode Register  
 
 <img alt="GPIO_MODER" src="img/GPIO_MODER.png" width="700">
 
@@ -511,7 +517,7 @@ Each port pin is associated with **two bits** in the mode register:
 - `10` – Alternate function mode  
 - `11` – Analog mode
 
-#### Output Type Register  
+##### STM32F407VG: Output Type Register  
 
 <img alt="GPIOx_OTYPER" src="img/GPIOx_OTYPER.png" width="700">
 
@@ -520,7 +526,7 @@ This register configures output pins as either **push-pull** or **open-drain**:
 - `0` – Push-pull  
 - `1` – Open-drain  
 
-#### Output Speed Register  
+##### STM32F407VG: Output Speed Register  
 
 <img alt="GPIOx_OSPEEDR" src="img/GPIOx_OSPEEDR.png" width="700">
 
@@ -531,7 +537,7 @@ This register determines the maximum switching speed of the port pins:
 - `10` – High speed (25 MHz to 100 MHz)  
 - `11` – Very high speed (50 MHz to 180 MHz)  
 
-#### Pull-up / Pull-down Register  
+##### STM32F407VG: Pull-up / Pull-down Register  
 
 <img alt="GPIO_PUPDR" src="img/GPIO_PUPDR.png" width="700">
 
@@ -542,10 +548,62 @@ This register configures the internal pull-up or pull-down resistors for each pi
 - `10` – Pull-down  
 - `11` – Reserved  
 
-#### Data Registers: Output Register and Input Register  
+##### STM32F407VG Data Registers: Output Register and Input Register  
 
 <img alt="GPIO_IDR" src="img/GPIO_IDR.png" width="700">
 <img alt="GPIO_ODR" src="img/GPIO_ODR.png" width="700">
+
+These registers store the state of the GPIO pins, where:  
+
+- `1` – ON (High)  
+- `0` – OFF (Low)  
+
+#### STM32F103C6 (Blue Pill) Port Registers
+
+**Control Registers:**  
+
+- `GPIOx_CRL` – Selects the I/O direction.  
+- `GPIOx_CRH` – Selects the output type (push-pull or open-drain).  
+
+**Data Registers:**  
+
+- `GPIOx_IDR` – Stores input data (read-only).  
+- `GPIOx_ODR` – Stores output data (read/write).  
+
+##### STM32F103C6: Configuration Register Low and Configuration Register High
+
+`GPIOx_CRL` controls the configuration of pins **0 to 7** of the corresponding GPIO port.
+
+<img alt="blue_pill_GPIOx_CRL" src="img/blue_pill_GPIOx_CRL.png" width="700">
+
+`GPIOx_CRH` controls the configuration of pins **8 to 15** of the corresponding GPIO port.  
+
+<img alt="blue_bill_GPIOx_CRH" src="img/blue_bill_GPIOx_CRH.png" width="700">
+
+Each pin is associated with **four bits** in these register:  
+
+- Lower two bits **MODE[1:0]** defines the operating mode (and speed) of the pin:  
+  - `00` – Input mode  
+  - `01` – Output mode (Max speed 10 MHz)  
+  - `10` – Output mode (Max speed 2 MHz)  
+  - `11` – Output mode (Max speed 50 MHz)  
+
+- Higher two bits **CNF[1:0]** configures the function of the pin based on the mode:  
+  - **Input mode (`MODE = 00`)**:  
+    - `00` – Analog input  
+    - `01` – Floating input  
+    - `10` – Input with pull-up/pull-down resistors (`GPIOx_ODR` is used in this case)
+    - `11` – Reserved  
+  - **Output mode (`MODE ≠ 00`)**:  
+    - `00` – General-purpose push-pull  
+    - `01` – General-purpose open-drain  
+    - `10` – Alternate function push-pull  
+    - `11` – Alternate function open-drain  
+
+##### STM32F103C6 Data Registers: Output Register and Input Register  
+
+<img alt="blue_pill_GPIOx_IDR" src="img/blue_pill_GPIOx_IDR.png" width="700">
+<img alt="blue_pill_GPIOx_ODR" src="img/blue_pill_GPIOx_ODR.png" width="700">
 
 These registers store the state of the GPIO pins, where:  
 
