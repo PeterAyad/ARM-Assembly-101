@@ -835,7 +835,7 @@ Install `Proteus` as usual, ensure it is working properly, and verify that it co
    3. Choose code file as the HEX file generated from the compiler
 6. Run the simulation
 
-<img alt="stmProteus" src="img/stmProteus.jpg" width="700">
+<img alt="stmProteus" src="img/stmProteus.png" width="700">
 
 ### Keil Installation  
 
