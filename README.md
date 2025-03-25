@@ -7,9 +7,11 @@
   - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
   - [Code Structure](#code-structure)
+    - [Data Types in ARM Assembly](#data-types-in-arm-assembly)
     - [Important Notations](#important-notations)
     - [ARM Instructions](#arm-instructions)
     - [Differences Between ARM and x86 Assembly](#differences-between-arm-and-x86-assembly)
+    - [Addressing Modes](#addressing-modes)
     - [General Code Structure](#general-code-structure)
     - [Bit Operations and Bitmasking in ARM Assembly](#bit-operations-and-bitmasking-in-arm-assembly)
       - [Understanding Bit Operations](#understanding-bit-operations)
@@ -85,7 +87,23 @@ I assume you have prior experience with **x86 Assembly programming**. You may ne
 - [STM32F103](https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
 - [ILI9341](https://download.mikroe.com/documents/smart-displays/easytft/ILI9341-ILITEK.pdf)
 
+and the ARM Cortex M3 Instructions List:
+
+- [ARM Instructions](https://os.mbed.com/media/uploads/4180_1/cortexm3_instructions.htm)
+
 ## Code Structure
+
+### Data Types in ARM Assembly
+
+| Directive | Size | Writable?       | Description                                                       |
+| --------- | ---- | --------------- | ----------------------------------------------------------------- |
+| `EQU`     | N/A  | No              | Defines a **constant value**                                      |
+| `DCB`     | 1B   | Depends on Area | **Define a Byte**                                                 |
+| `DCW`     | 2B   | Depends on Area | **Define a Word**                                                 |
+| `DCD`     | 4B   | Depends on Area | **Define a Doubleword**                                           |
+| `DCQ`     | 8B   | Depends on Area | **Define a Quadword**                                             |
+| `SPACE`   | N    | Depends on Area | Reserves **N bytes** of memory without initialization.            |
+| `FILL`    | N    | Depends on Area | Reserves **N bytes** and initializes them with a specified value. |
 
 ### Important Notations
 
@@ -95,25 +113,32 @@ I assume you have prior experience with **x86 Assembly programming**. You may ne
 
 2. Immediate Values (`#`)  
 
-   - `#` is used for immediate values in instructions like `MOV`, `ADD`, etc.  
+   - `#` is used for immediate values and constants in instructions like `MOV`, `ADD`, etc.  
    - Example:  
 
      ```assembly
      MOV R0, #2        ; Move the immediate value 2 into R0
      MOV R0, #(1 << 4) ; Move 16 (1 shifted left by 4) into R0
+
+     myConstant EQU 4
+     MOV R0, #myConstant
      ```
 
-3. Immediate Values with `LDR` (`=`)  
+3. Variables with `LDR` (`=`)  
 
-   - `LDR` with `=` allows loading larger immediate values (placed in a constant pool).  
+   - `LDR` with `=` allows loading (large immediate values - constant values - address of a variable).  
    - Example:  
 
      ```assembly
-     LDR R0, =0xFFF       ; Load the immediate value 0xFFF into R0
-     LDR R0, =0xFFF + 0x5 ; Load 0x1004 into R0
-     ```
+     LDR R0, =0xFFFFFF      ; Load the large immediate value 0xFFFFFF into R0
+     LDR R0, =0xFFF + 0x5   ; Load 0x1004 into R0
 
-   - **Important Note**: `LDR` with immediate values or variables is a pseudo-instruction which is translated to `MOV` by the compiler. EX: `LDR R0, =Variable` is exactly equal to `MOV R0, #Variable`
+     myConstant EQU 4
+     LDR R0, =myConstant    ; Loads 4 into R0
+     
+     myVariable DCB 5
+     LDR R0, =myVariable    ; Loads address of myVariable into R0 (needs another load to get 5)
+     ```
   
 4. Dereferencing with `[...]`  
 
@@ -145,44 +170,46 @@ I assume you have prior experience with **x86 Assembly programming**. You may ne
      MOV R1, #10 @ Another comment in unified syntax
      ```
 
-### [ARM Instructions](https://os.mbed.com/media/uploads/4180_1/cortexm3_instructions.htm)
+### ARM Instructions
 
-`<imm/var>` = immediate values or variables
+`<imm/cnst>` = immediate values or constants
+`<var>` = variable
 
-| **Operation**                  | **ARM Assembly**         | **x86 Assembly**    | **Description**                               |
-| ------------------------------ | ------------------------ | ------------------- | --------------------------------------------- |
-| **Move Data**                  | `MOV R0, R1`             | `MOV AX, BX`        | Move data between registers                   |
-| **Load Immediate or Variable** | `MOV R0, #<imm/var>`     | `MOV AX, <imm/var>` | Load an immediate or a variable               |
-| **Load Immediate or Variable** | `LDR R0, =<imm/var>`     | `MOV AX, <imm/var>` | Load an immediate or a variable               |
-| **Load from Memory**           | `LDR R0, [R1]`           | `MOV AX, [BX]`      | Load a word from memory                       |
-| **Store to Memory**            | `STR R0, [R1]`           | `MOV [BX], AX`      | Store a word to memory                        |
-| **Addition**                   | `ADD R0, R1, R2`         | `ADD AX, BX`        | Add two registers                             |
-| **Addition**                   | `ADD R0, R1, #<imm/var>` | `ADD AX, <imm/var>` | Add using Immediate or Variable               |
-| **Subtraction**                | `SUB R0, R1, R2`         | `SUB AX, BX`        | Subtract two registers                        |
-| **Subtraction**                | `SUB R0, R1, #<imm/var>` | `SUB AX, <imm/var>` | Subtract using Immediate or Variable          |
-| **Multiplication**             | `MUL R0, R1, R2`         | `MUL BX`            | Multiply (ARM: 3-operand, x86: implicit `AX`) |
-| **Bitwise AND**                | `AND R0, R1, R2`         | `AND AX, BX`        | Logical AND                                   |
-| **Bitwise AND**                | `AND R0, R1, #<imm/var>` | `AND AX, <imm/var>` | Logical AND                                   |
-| **Bitwise OR**                 | `ORR R0, R1, R2`         | `OR AX, BX`         | Logical OR                                    |
-| **Bitwise OR**                 | `ORR R0, R1, #<imm/var>` | `OR AX, <imm/var>`  | Logical OR                                    |
-| **Bitwise XOR**                | `EOR R0, R1, R2`         | `XOR AX, BX`        | Logical XOR                                   |
-| **Bitwise XOR**                | `EOR R0, R1, #<imm/var>` | `XOR AX, <imm/var>` | Logical XOR                                   |
-| **Bit clear**                  | `BIC R0, R1, #<imm/var>` | -                   | Clear bits in Op1 in 1s locations in Op2      |
-| **Shift Left**                 | `LSL R0, R1, R2`         | `SHL AX, BX`        | Logical shift left                            |
-| **Shift Left**                 | `LSL R0, R1, #<imm/var>` | `SHL AX, <imm/var>` | Logical shift left                            |
-| **Shift Right**                | `LSR R0, R1, R2`         | `SHR AX, BX`        | Logical shift right                           |
-| **Shift Right**                | `LSR R0, R1, #<imm/var>` | `SHR AX, <imm/var>` | Logical shift right                           |
-| **Branch (Jump)**              | `B label`                | `JMP label`         | Unconditional jump                            |
-| **Branch if Zero**             | `BEQ label`              | `JE label`          | Jump if equal (zero flag set)                 |
-| **Binary Test**                | `TST R0, R1`             | `TEST AX, BX`       | Compare two registers (with AND)              |
-| **Compare**                    | `CMP R0, R1`             | `CMP AX, BX`        | Compare two registers (with subtraction)      |
-| **Function Call**              | `BL function`            | `CALL function`     | Call a function                               |
-| **Function Return**            | `BX LR`                  | `RET`               | Return from function                          |
-| **Push to Stack**              | `PUSH {R0}`              | `PUSH AX`           | Push register to stack                        |
-| **Push All to Stack**          | `PUSH {R0-R12, LR}`      | `PUSHA`             | Push all registers to stack                   |
-| **Pop from Stack**             | `POP {R0}`               | `POP AX`            | Pop register from stack                       |
-| **Pop All from Stack**         | `POP {R0-R12, LR}`       | `POPA`              | Pop all registers from stack                  |
-| **No Operation**               | `NOP`                    | `NOP`               | No operation                                  |
+| **Operation**                  | **ARM Assembly**          | **x86 Assembly**     | **Description**                               |
+| ------------------------------ | ------------------------- | -------------------- | --------------------------------------------- |
+| **Move Data**                  | `MOV R0, R1`              | `MOV AX, BX`         | Move data between registers                   |
+| **Load Immediate or Constant** | `MOV R0, #<imm/cnst>`     | `MOV AX, <imm/cnst>` | Load an immediate or a Constant               |
+| **Load Immediate or Constant** | `LDR R0, =<imm/cnst>`     | `MOV AX, <imm/cnst>` | Load an immediate or a Constant to register   |
+| **Load Address of Variable**   | `LDR R0, =<var>`          | `LEA AX, <var>`      | Load address of a variable to register        |
+| **Load from Memory**           | `LDR R0, [R1]`            | `MOV AX, [BX]`       | Load a word from memory                       |
+| **Store to Memory**            | `STR R0, [R1]`            | `MOV [BX], AX`       | Store a word to memory                        |
+| **Addition**                   | `ADD R0, R1, R2`          | `ADD AX, BX`         | Add two registers                             |
+| **Addition**                   | `ADD R0, R1, #<imm/cnst>` | `ADD AX, <imm/cnst>` | Add using Immediate or Constant               |
+| **Subtraction**                | `SUB R0, R1, R2`          | `SUB AX, BX`         | Subtract two registers                        |
+| **Subtraction**                | `SUB R0, R1, #<imm/cnst>` | `SUB AX, <imm/cnst>` | Subtract using Immediate or Constant          |
+| **Multiplication**             | `MUL R0, R1, R2`          | `MUL BX`             | Multiply (ARM: 3-operand, x86: implicit `AX`) |
+| **Bitwise AND**                | `AND R0, R1, R2`          | `AND AX, BX`         | Logical AND                                   |
+| **Bitwise AND**                | `AND R0, R1, #<imm/cnst>` | `AND AX, <imm/cnst>` | Logical AND                                   |
+| **Bitwise OR**                 | `ORR R0, R1, R2`          | `OR AX, BX`          | Logical OR                                    |
+| **Bitwise OR**                 | `ORR R0, R1, #<imm/cnst>` | `OR AX, <imm/cnst>`  | Logical OR                                    |
+| **Bitwise XOR**                | `EOR R0, R1, R2`          | `XOR AX, BX`         | Logical XOR                                   |
+| **Bitwise XOR**                | `EOR R0, R1, #<imm/cnst>` | `XOR AX, <imm/cnst>` | Logical XOR                                   |
+| **Bit clear**                  | `BIC R0, R1, #<imm/cnst>` | -                    | Clear bits in Op1 in 1s locations in Op2      |
+| **Shift Left**                 | `LSL R0, R1, R2`          | `SHL AX, BX`         | Logical shift left                            |
+| **Shift Left**                 | `LSL R0, R1, #<imm/cnst>` | `SHL AX, <imm/cnst>` | Logical shift left                            |
+| **Shift Right**                | `LSR R0, R1, R2`          | `SHR AX, BX`         | Logical shift right                           |
+| **Shift Right**                | `LSR R0, R1, #<imm/cnst>` | `SHR AX, <imm/cnst>` | Logical shift right                           |
+| **Branch (Jump)**              | `B label`                 | `JMP label`          | Unconditional jump                            |
+| **Branch if Zero**             | `BEQ label`               | `JE label`           | Jump if equal (zero flag set)                 |
+| **Binary Test**                | `TST R0, R1`              | `TEST AX, BX`        | Compare two registers (with AND)              |
+| **Compare**                    | `CMP R0, R1`              | `CMP AX, BX`         | Compare two registers (with subtraction)      |
+| **Function Call**              | `BL function`             | `CALL function`      | Call a function                               |
+| **Function Return**            | `BX LR`                   | `RET`                | Return from function                          |
+| **Push to Stack**              | `PUSH {R0}`               | `PUSH AX`            | Push register to stack                        |
+| **Push All to Stack**          | `PUSH {R0-R12, LR}`       | `PUSHA`              | Push all registers to stack                   |
+| **Pop from Stack**             | `POP {R0}`                | `POP AX`             | Pop register from stack                       |
+| **Pop All from Stack**         | `POP {R0-R12, LR}`        | `POPA`               | Pop all registers from stack                  |
+| **No Operation**               | `NOP`                     | `NOP`                | No operation                                  |
 
 ### Differences Between ARM and x86 Assembly  
 
@@ -277,6 +304,19 @@ I assume you have prior experience with **x86 Assembly programming**. You may ne
 
 11. **Unified Syntax**  
     - ARM supports an alternative syntax called `.syntax unified`, which is different from traditional ARM assembly.  
+
+### Addressing Modes
+
+| Addressing Mode                  | Example                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------- |
+| **Immediate Addressing**         | `MOV r0, #10` (Load immediate value `10` into `r0`).                                  |
+| **Register Addressing**          | `MOV r1, r2` (Copy value of `r2` into `r1`).                                          |
+| **Register Indirect Addressing** | `LDR r0, [r1]` (Load value from memory at address in `r1` into `r0`).                 |
+| **Pre-Indexed Addressing**       | `LDR r0, [r1, #4]` (Load value from `r1 + 4` into `r0`).                              |
+| **Post-Indexed Addressing**      | `LDR r0, [r1], #4` (Load value from `r1`, then increment `r1` by 4).                  |
+| **Scaled Register Addressing**   | `LDR r0, [r1, r2, LSL #2]` (Load from `r1 + (r2 × 4)`).                               |
+| **PC-Relative Addressing**       | `LDR r0, =variable` (Assembler generates `LDR r0, [PC, #offset]`).                    |
+| **Stack Addressing (Push/Pop)**  | `PUSH {r0, r1}` (Store `r0` and `r1` on stack), `POP {r0}` (Restore `r0` from stack). |
 
 ### General Code Structure
 
