@@ -63,6 +63,7 @@
       - [Blinking LEDs](#blinking-leds)
       - [LED on Button Press](#led-on-button-press)
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
+      - [Drawing Image on the TFT Display](#drawing-image-on-the-tft-display)
     - [Hardware](#hardware)
       - [Button-Triggered LED](#button-triggered-led)
       - [LED Blink](#led-blink)
@@ -944,6 +945,12 @@ You can see the code [Here](./examples%20for%20Proteus/Button%20With%20LED/Butto
 <img alt="fillScreenExample" src="examples for Proteus/Fill Screen/fillScreenExample.png" width="700">
 
 You can see the code [Here](./examples%20for%20Proteus/Fill%20Screen/main.s). This code is explained in the [Interfacing Between STM32 and TFT Display](#interfacing-between-stm32-and-tft-display) part.
+
+#### Drawing Image on the TFT Display
+
+<img alt="drawingImage" src="examples for Proteus/Drawing Image/drawingImage.png" width="700">
+
+You can see the code [Here](./examples%20for%20Proteus/Drawing%20Image/main.s). This image data is generated using the python script [here](./image%20gerenation/imgToData.py).
 
 ### Hardware
 
