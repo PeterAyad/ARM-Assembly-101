@@ -161,11 +161,6 @@ TFT_Init
     STR R2, [R1]
     BL delay
 
-    ; Software Reset
-    MOV R0, #0x01
-    BL TFT_WriteCommand
-    BL delay
-
     ; Display OFF
     MOV R0, #0x28
     BL TFT_WriteCommand
