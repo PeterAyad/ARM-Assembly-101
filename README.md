@@ -173,6 +173,7 @@ and the ARM Cortex M3 Instructions List:
 ### ARM Instructions
 
 `<imm/cnst>` = immediate values or constants
+
 `<var>` = variable
 
 | **Operation**                  | **ARM Assembly**          | **x86 Assembly**     | **Description**                               |
