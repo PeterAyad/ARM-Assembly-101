@@ -1,5 +1,5 @@
 ; This code is written for STM32F407VG
-; LEDs on PD12-PD15
+; LEDs on PD0-3
 
     EXPORT __main
 
@@ -34,17 +34,17 @@ __main FUNCTION
     ORR     R0, R0, #(1 << 3)         
     STR     R0, [R1]           
 
-    ; Configure pins 12-15 as output mode
+    ; Configure pins 0-3 as output mode
     LDR     R1, =GPIOD_BASE +  GPIO_MODER  
     LDR     R0, [R1]          
-    LDR     R0, =(0x55 << 12)  
-    STR     R0, [R1]           
+    LDR     R0, =0x55
+    STR     R0, [R1]                      
 
     ; Turn off using Output port
 turnON
     LDR     R1, =GPIOD_BASE +  GPIO_ODR
     LDR     R0, [R1]
-    ORR     R0, R0, #(0xF << 12)
+    ORR     R0, R0, #0xF
     STR     R0, [R1]
 
     ; Delay
@@ -58,7 +58,7 @@ delay1
 turnOFF
     LDR     R1, =GPIOD_BASE +  GPIO_ODR     
     LDR     R0, [R1]
-    BIC     R0, R0, #(0xF << 12)   
+    BIC     R0, R0, #0xF
     STR     R0, [R1]    
 
     ; Delay

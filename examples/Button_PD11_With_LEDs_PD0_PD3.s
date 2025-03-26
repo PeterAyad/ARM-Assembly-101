@@ -1,6 +1,6 @@
 ; This code is written for STM32F407VG
 ; Button on PD11
-; LED on PD15
+; LED on PD0-3
 
     EXPORT __main
 
@@ -33,14 +33,14 @@ __main FUNCTION
     ORR     R0, R0, #(1 << 3)         
     STR     R0, [R1]                
 
-    ; Configure pin 15 as output mode
+    ; Configure pin 0-3 as output mode
     ; Configure pin 11 as input mode
     LDR     R1, =GPIOD_BASE +  GPIO_MODER 
     LDR     R0, [R1]  
-    LDR     R0, =0x40000000
+    LDR     R0, =0x00000055
     STR     R0, [R1]            
 
-    ; Enable pulldown resistor on pin 11(Button)
+    ; Enable pulldown resistor on pin 11 (Button)
     LDR     R1, =GPIOD_BASE +  GPIO_PUPDR   
     LDR     R0, [R1]
     LDR     R0, =0x00800000
@@ -56,14 +56,14 @@ readInput
 turnOff
     LDR     R1, =GPIOD_BASE + GPIO_ODR       
     LDR     R0, [R1]
-    BIC     R0, R0, #(1 << 15)  ; Clear PB15 (turn LED off)
+    BIC     R0, R0, #0xF  ; turn LED off
     STR     R0, [R1]
     B       readInput
 
 turnOn
     LDR     R1, =GPIOD_BASE + GPIO_ODR       
     LDR     R0, [R1]
-    ORR     R0, R0, #(1 << 15)  ; Set PB15 HIGH (turn LED on)
+    ORR     R0, R0, #0xF  ; turn LED on
     STR     R0, [R1]
     B       readInput
     

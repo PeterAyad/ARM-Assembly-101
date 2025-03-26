@@ -956,28 +956,25 @@ You can see the code [Here](./examples%20for%20Proteus/Drawing%20Image/main.s). 
 
 #### Button-Triggered LED
 
-You can see the code [Here](./examples/Button11WithLED15.s)
+You can see the code [Here](./examples/Button_PD11_With_LEDs_PD0_PD3.s)
 
-1. Enable GPIO clock
-2. Configure pin 15 as output mode
-3. Configure pin 11 as input mode
-4. Enable pulldown resistor on pin 11(Button)
+1. Enable GPIOD clock
+2. Configure pins PD0-PD3 as output mode
+3. Configure pin PD11 as input mode
+4. Enable pulldown resistor on pin PD11 (Button)
 5. Loop
    1. Read Button from Input Port
-   2. Turn On LED using output port
-   3. Turn Off LED using output port
+   2. Turn On LEDs using output port
+   3. Turn Off LEDs using output port
 
 #### LED Blink
 
-You can see the code [Here](./examples/LED.s)
+You can see the code [Here](./examples/LEDs_PD0_PD3.s)
 
-1. Enable GPIO-D clock
-2. Configure pins 12-15 as output mode
-3. Configure pins as push-pull (default setting)
-4. Set pin speed to low
-5. Disable pull-up/pull-down resistors
-6. loop
-    1. Turn off using Output port
+1. Enable GPIOD clock
+2. Configure pins PD0-PD3 as output mode
+3. loop
+    1. Turn on LEDs using Output port
     2. Delay
-    3. Turn off using Output port
+    3. Turn off LEDs using Output port
     4. Delay
