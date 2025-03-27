@@ -65,8 +65,10 @@
       - [Filling the TFT Display with Color](#filling-the-tft-display-with-color)
       - [Drawing Image on the TFT Display](#drawing-image-on-the-tft-display)
     - [Hardware](#hardware)
-      - [Button-Triggered LED](#button-triggered-led)
       - [LED Blink](#led-blink)
+      - [Button-Triggered LED](#button-triggered-led)
+      - [Fill Screen With Single Color](#fill-screen-with-single-color)
+      - [Draw Image On Screen](#draw-image-on-screen)
 
 ## Introduction
 
@@ -954,6 +956,18 @@ You can see the code [Here](./examples%20for%20Proteus/Drawing%20Image/main.s). 
 
 ### Hardware
 
+#### LED Blink
+
+You can see the code [Here](./examples/LEDs_PD0_PD3.s)
+
+1. Enable GPIOD clock
+2. Configure pins PD0-PD3 as output mode
+3. loop
+    1. Turn on LEDs using Output port
+    2. Delay
+    3. Turn off LEDs using Output port
+    4. Delay
+
 #### Button-Triggered LED
 
 You can see the code [Here](./examples/Button_PD11_With_LEDs_PD0_PD3.s)
@@ -967,14 +981,10 @@ You can see the code [Here](./examples/Button_PD11_With_LEDs_PD0_PD3.s)
    2. Turn On LEDs using output port
    3. Turn Off LEDs using output port
 
-#### LED Blink
+#### Fill Screen With Single Color
 
-You can see the code [Here](./examples/LEDs_PD0_PD3.s)
+You can see the code [Here](./examples/Fill_LCD.s)
 
-1. Enable GPIOD clock
-2. Configure pins PD0-PD3 as output mode
-3. loop
-    1. Turn on LEDs using Output port
-    2. Delay
-    3. Turn off LEDs using Output port
-    4. Delay
+#### Draw Image On Screen
+
+You can see the code [Here](./examples/Draw%20Image)
