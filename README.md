@@ -952,7 +952,7 @@ You can see the code [Here](./examples%20for%20Proteus/Fill%20Screen/main.s). Th
 
 <img alt="drawingImage" src="examples for Proteus/Drawing Image/drawingImage.png" width="700">
 
-You can see the code [Here](./examples%20for%20Proteus/Drawing%20Image/main.s). This image data is generated using the python script [here](./image%20gerenation/imgToData.py).
+You can see the code [Here](./examples%20for%20Proteus/Drawing%20Image/main.s). This image data is generated using the python script [here](./image%20generation/imgToData.py).
 
 ### Hardware
 
